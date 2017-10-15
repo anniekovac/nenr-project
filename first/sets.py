@@ -1,33 +1,33 @@
 from domain import Domain
 
 
-class IFuzzySet(object):
+class MutableFuzzySet(Domain):
+	def __init__(self, domain):
+		self.domain = domain
+		self.memberships = [None]*len(self.domain)
+
 	def get_domain(self):
 		"""
 		:return: IDomain 
 		"""
-		pass
+		return self.domain
 
 	def get_value_at(self, domain_element):
 		"""
-		"Asking" domain for index of domain_element.
-
+		"Asking" domain for value of domain_element.
 		:param domain_element: DomainElement 
 		:return: double
 		"""
-		pass
+		index = self.domain.index_of_element(domain_element)
+		return self.memberships[index]
 
-
-class MutableFuzzySet(IFuzzySet, Domain):
-	def __init__(self, domain):
-		self.memberships = []
-		self.domain = domain
-
-	def set(self, domain_element, double_value):
+	def set(self, domain_element, element_value):
 		"""
 		:param domain_element: DomainElement 
-		:param double_value: double
+		:param element_value: double
 		:return: MutableFuzzySet
 		"""
-		pass
+		index = self.domain.index_of_element(domain_element)
+		self.memberships[index] = element_value
+		return self
 
