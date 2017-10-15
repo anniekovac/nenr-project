@@ -4,7 +4,7 @@ import itertools
 class Domain(object):
     """
     Parent class for SimpleDomain and 
-    CompositeDomain. Implementing basic functionlities
+    CompositeDomain. Implementing basic functionalities
     for those two classes.
     """
     # variable defined here locally,
@@ -28,7 +28,7 @@ class Domain(object):
         :param index: int 
         :return: DomainElement
         """
-        return self.domain_elemens[index]
+        return self.domain_elements[index]
 
 
 class SimpleDomain(Domain):
