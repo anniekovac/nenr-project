@@ -2,11 +2,21 @@ import itertools
 
 
 class Domain(object):
-
+    """
+    Parent class for SimpleDomain and 
+    CompositeDomain. Implementing basic functionlities
+    for those two classes.
+    """
+    # variable defined here locally,
+    # but it is assumed that this variable
+    # should also be defined in lower classes
+    # (SimpleDomain and CompositeDomain)
     domain_elements = []
 
     def index_of_element(self, domain_element):
         """
+        Getting index of an element "domain_element" in
+        list of elements domain_elements defined in classes.
         :param domain_element: DomainElement 
         :return: int
         """
@@ -14,6 +24,7 @@ class Domain(object):
 
     def element_for_index(self, index):
         """
+        Getting domain element on "index".
         :param index: int 
         :return: DomainElement
         """
@@ -21,9 +32,17 @@ class Domain(object):
 
 
 class SimpleDomain(Domain):
+    """
+    Class that represents simple domain of 
+    integer numbers between two integers: first and
+    last.
+    """
 
     def __init__(self, first, last, domain_name=""):
         """
+        Initializing domain parameters first, last and
+        domain_name. Also, filling domain_elements list 
+        with list of integers between first and last.
         :param first: int 
         :param last: int
         :param domain_name: str or None
@@ -44,6 +63,8 @@ class SimpleDomain(Domain):
 
     def get_cardinality(self):
         """
+        Getting number of elements that domain
+        contains.
         :return: int 
         """
         return len(self.domain_elements)
@@ -67,12 +88,14 @@ class SimpleDomain(Domain):
 
     def get_first(self):
         """
+        Returning first element of domain.
         :return: int 
         """
         return self.first
 
     def get_last(self):
         """
+        Returning last element of domain.
         :return: int 
         """
         return self.last
@@ -110,6 +133,7 @@ class CompositeDomain(Domain):
 
     def get_cardinality(self):
         """
+        Returning number of domain elements.
         :return: int 
         """
         return len(self.domain_elements)
