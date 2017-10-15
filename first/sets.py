@@ -1,3 +1,6 @@
+from domain import Domain
+
+
 class IFuzzySet(object):
 	def get_domain(self):
 		"""
@@ -15,9 +18,10 @@ class IFuzzySet(object):
 		pass
 
 
-class MutableFuzzySet(IFuzzySet):
-	def __init__(self, idomain):
+class MutableFuzzySet(IFuzzySet, Domain):
+	def __init__(self, domain):
 		self.memberships = []
+		self.domain = domain
 
 	def set(self, domain_element, double_value):
 		"""
