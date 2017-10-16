@@ -48,18 +48,90 @@ class MutableFuzzySet(FuzzySet):
 		self.memberships[index] = element_value
 		return self
 
-def unitary_function(domain):
+
+def _step_function(domain):
 	"""
-	Setting double values to a list based on
-	domain.domain_elements list.
-	:param domain: Domain
+	:param domain: Domain 
 	:return: list of doubles
 	"""
-	### STEP FUNCTION
 	# this is approximately the middle
 	middle = int(float(len(domain.domain_elements))/2)
 	output_list = [0 if index < middle else 1 for (index, element) in enumerate(domain.domain_elements)]
 	return output_list
+
+
+def _gamma_function(domain):
+	"""
+	Implementation of gamma function.
+	It returns list of values that corresponds
+	to domain.domain_elements.
+	In this implementation alpha_param = 0.3
+	and beta_param = 0.6.
+	:param domain: Domain
+	:return: list of doubles
+	"""
+	alpha = int(0.3*len(domain.domain_elements))
+	beta = int(0.6*len(domain.domain_elements))
+	output_list = [0]*len(domain.domain_elements)
+
+	for index, element in enumerate(domain.domain_elements):
+		if element < alpha:
+			value = 0.0
+		if element >= alpha and element < beta:
+			value = (element - alpha)/(beta - alpha)
+		if element >= beta:
+			value = 1.0
+		output_list[index] = value
+
+	return output_list
+
+
+def _lambda_function(domain):
+	"""
+	Implementation of lambda function.
+	It returns list of values that corresponds
+	to domain.domain_elements.
+	In this implementation alpha_param = 0.25, 
+	beta_param = 0.5 and gamma_param = 0.75.
+	:param domain: Domain
+	:return: list of doubles
+	"""
+	alpha = int(0.25*len(domain.domain_elements))
+	beta = int(0.5*len(domain.domain_elements))
+	gamma = int(0.75*len(domain.domain_elements))
+	output_list = [0]*len(domain.domain_elements)
+
+	for index, element in enumerate(domain.domain_elements):
+		if element < alpha:
+			value = 0.0
+		if element >= alpha and element < beta:
+			value = (element - alpha)/(beta - alpha)
+		if element >= beta and element < gamma:
+			value = (gamma - element) / (gamma - beta)
+		if element >= gamma:
+			value = 1.0
+		output_list[index] = value
+
+	return output_list
+
+def unitary_function(func_name, domain):
+	"""
+	Setting double values to a list based on
+	domain.domain_elements list.
+	:param func_name : str (name of the function you want to use)
+						"step", "gamma", "lambda"
+	:param domain: Domain
+	:return: list of doubles
+	"""
+	function_dict = {
+
+		"step" : _step_function(domain),
+		"gamma" : _gamma_function(domain),
+		"lambda" : _lambda_function(domain)
+	}
+	return function_dict[func_name]
+
+
 
 class CalculatedFuzzySet(FuzzySet):
 
@@ -68,9 +140,11 @@ class CalculatedFuzzySet(FuzzySet):
 		self.unitary_function = unitary_function
 
 if __name__ == "__main__":
-	simple_domain = SimpleDomain(1, 5, "Pero")
+	simple_domain = SimpleDomain(1, 40, "Pero")
 	my_fuzzy = MutableFuzzySet(simple_domain, "PeroSet")
 	my_fuzzy.set_value_at(1, 0.4)
 	my_fuzzy.set_value_at(2, 0.9)
 	#my_fuzzy.print_fuzzy_set()
-	unitary_function(simple_domain)
+	lista = unitary_function("lambda", simple_domain)
+	for index, item in enumerate(lista):
+		print("Index: {}, Element domene: {}, Vrijednost: {}".format(index, simple_domain.domain_elements[index], item))
