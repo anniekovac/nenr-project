@@ -114,12 +114,39 @@ def _lambda_function(domain):
 
 	return output_list
 
-def unitary_function(func_name, domain):
+
+def _l_function(domain):
+	"""
+	Implementation of L function.
+	It returns list of values that corresponds
+	to domain.domain_elements.
+	In this implementation alpha_param = 0.3, 
+	beta_param = 0.6.
+	:param domain: Domain
+	:return: list of doubles
+	"""
+	alpha = int(0.3*len(domain.domain_elements))
+	beta = int(0.6*len(domain.domain_elements))
+	output_list = [0]*len(domain.domain_elements)
+
+	for index, element in enumerate(domain.domain_elements):
+		if element < alpha:
+			value = 1.0
+		if element >= alpha and element < beta:
+			value = (beta - element)/(beta - alpha)
+		if element >= beta:
+			value = 0.0
+		output_list[index] = value
+
+	return output_list
+
+
+def unitary_function(domain, func_name="gamma"):
 	"""
 	Setting double values to a list based on
 	domain.domain_elements list.
 	:param func_name : str (name of the function you want to use)
-						"step", "gamma", "lambda"
+						"step", "gamma", "lambda", "l"
 	:param domain: Domain
 	:return: list of doubles
 	"""
@@ -127,7 +154,8 @@ def unitary_function(func_name, domain):
 
 		"step" : _step_function(domain),
 		"gamma" : _gamma_function(domain),
-		"lambda" : _lambda_function(domain)
+		"lambda" : _lambda_function(domain),
+		"l" : _l_function(domain)
 	}
 	return function_dict[func_name]
 
@@ -135,16 +163,19 @@ def unitary_function(func_name, domain):
 
 class CalculatedFuzzySet(FuzzySet):
 
-	def __init__(self, domain, unitary_function):
+	def __init__(self, domain):
 		self.domain = domain
 		self.unitary_function = unitary_function
+		self.memberships = self.unitary_function(self.domain)
 
 if __name__ == "__main__":
 	simple_domain = SimpleDomain(1, 40, "Pero")
 	my_fuzzy = MutableFuzzySet(simple_domain, "PeroSet")
 	my_fuzzy.set_value_at(1, 0.4)
 	my_fuzzy.set_value_at(2, 0.9)
-	#my_fuzzy.print_fuzzy_set()
-	lista = unitary_function("lambda", simple_domain)
+	my_fuzzy.print_fuzzy_set()
+	lista = unitary_function(simple_domain, "l")
 	for index, item in enumerate(lista):
 		print("Index: {}, Element domene: {}, Vrijednost: {}".format(index, simple_domain.domain_elements[index], item))
+
+	my_calculated = CalculatedFuzzySet(simple_domain)
