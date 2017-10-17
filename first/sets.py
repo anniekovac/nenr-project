@@ -157,6 +157,12 @@ def unitary_function(domain, func_name="gamma"):
 
 
 class CalculatedFuzzySet(FuzzySet):
+	"""
+	Type of FuzzySet that receives unitary function in order
+	to calculate its memberships values. 
+	This unitary function "defines" the way in which values 
+	will be distributed across the domain of the FuzzySet.
+	"""
 
 	def __init__(self, domain, my_func="gamma", set_name=""):
 		self.domain = domain
