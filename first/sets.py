@@ -1,5 +1,5 @@
 from domain import SimpleDomain
-
+import numpy
 
 class FuzzySet(object):
 
@@ -40,6 +40,8 @@ class MutableFuzzySet(FuzzySet):
 		:param element_value: double
 		:return: MutableFuzzySet
 		"""
+		if not(element_value>=0 and element_value <=1):
+			raise ValueError("Trying to set incorrect value! Try any value between 0 and 1.")
 		index = self.domain.index_of_element(domain_element)
 		self.memberships[index] = element_value
 		return self
@@ -55,7 +57,6 @@ def _step_function(domain):
 	output_list = [0 if index < middle else 1 for (index, element) in enumerate(domain.domain_elements)]
 	return output_list
 
-
 def _gamma_function(domain):
 	"""
 	Implementation of gamma function.
@@ -66,16 +67,17 @@ def _gamma_function(domain):
 	:param domain: Domain
 	:return: list of doubles
 	"""
-	alpha = int(0.3*len(domain.domain_elements))
-	beta = int(0.6*len(domain.domain_elements))
-	output_list = [0]*len(domain.domain_elements)
+	domain_len = len(domain.domain_elements)
+	alpha = int(0.3*domain_len)
+	beta = int(0.6*domain_len)
+	output_list = [0]*domain_len
 
 	for index, element in enumerate(domain.domain_elements):
-		if element < alpha:
+		if index < alpha:
 			value = 0.0
-		if element >= alpha and element < beta:
-			value = (element - alpha)/(beta - alpha)
-		if element >= beta:
+		if index >= alpha and index < beta:
+			value = (index - alpha)/(beta - alpha)
+		if index >= beta:
 			value = 1.0
 		output_list[index] = value
 
@@ -92,19 +94,20 @@ def _lambda_function(domain):
 	:param domain: Domain
 	:return: list of doubles
 	"""
-	alpha = int(0.25*len(domain.domain_elements))
-	beta = int(0.5*len(domain.domain_elements))
-	gamma = int(0.75*len(domain.domain_elements))
-	output_list = [0]*len(domain.domain_elements)
+	domain_len = len(domain.domain_elements)
+	alpha = int(0.25*domain_len)
+	beta = int(0.5*domain_len)
+	gamma = int(0.75*domain_len)
+	output_list = [0]*domain_len
 
 	for index, element in enumerate(domain.domain_elements):
-		if element < alpha:
+		if index < alpha:
 			value = 0.0
-		if element >= alpha and element < beta:
-			value = (element - alpha)/(beta - alpha)
-		if element >= beta and element < gamma:
-			value = (gamma - element) / (gamma - beta)
-		if element >= gamma:
+		if index >= alpha and index < beta:
+			value = (index - alpha)/(beta - alpha)
+		if index >= beta and index < gamma:
+			value = (gamma - index) / (gamma - beta)
+		if index >= gamma:
 			value = 1.0
 		output_list[index] = value
 
@@ -121,16 +124,17 @@ def _l_function(domain):
 	:param domain: Domain
 	:return: list of doubles
 	"""
-	alpha = int(0.3*len(domain.domain_elements))
-	beta = int(0.6*len(domain.domain_elements))
-	output_list = [0]*len(domain.domain_elements)
+	domain_len = len(domain.domain_elements)
+	alpha = int(0.3*domain_len)
+	beta = int(0.6*domain_len)
+	output_list = [0]*domain_len
 
 	for index, element in enumerate(domain.domain_elements):
-		if element < alpha:
+		if index < alpha:
 			value = 1.0
-		if element >= alpha and element < beta:
-			value = (beta - element)/(beta - alpha)
-		if element >= beta:
+		if index >= alpha and index < beta:
+			value = (beta - index)/(beta - alpha)
+		if index >= beta:
 			value = 0.0
 		output_list[index] = value
 
@@ -174,10 +178,13 @@ if __name__ == "__main__":
 	simple_domain = SimpleDomain(1, 40, "Pero")
 	my_fuzzy = MutableFuzzySet(simple_domain, "PeroSet")
 	my_fuzzy.set_value_at(1, 0.4)
-	my_fuzzy.set_value_at(2, 0.9)
-	my_fuzzy.print_fuzzy_set()
+	try:
+		my_fuzzy.set_value_at(2, 1.9)
+	except ValueError:
+		print("Correct error raised.")
+	#my_fuzzy.print_fuzzy_set()
 	lista = unitary_function(simple_domain, "l")
-	for index, item in enumerate(lista):
-		print("Index: {}, Element domene: {}, Vrijednost: {}".format(index, simple_domain.domain_elements[index], item))
+	# for index, item in enumerate(lista):
+	# 	print("Index: {}, Element domene: {}, Vrijednost: {}".format(index, simple_domain.domain_elements[index], item))
 
 	my_calculated = CalculatedFuzzySet(simple_domain)
