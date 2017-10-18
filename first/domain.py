@@ -4,7 +4,7 @@ import itertools
 class Domain(object):
     """
     Parent class for SimpleDomain and 
-    CompositeDomain. Implementing basic functionalities
+    CompositeDomain. Implementing basic functionality
     for those two classes.
     """
     # variable defined here locally,
@@ -17,7 +17,7 @@ class Domain(object):
         """
         Getting index of an element "domain_element" in
         list of elements domain_elements defined in classes.
-        :param domain_element: DomainElement 
+        :param domain_element: DomainElement (int or tuple)
         :return: int
         """
         return self.domain_elements.index(domain_element)
@@ -26,7 +26,7 @@ class Domain(object):
         """
         Getting domain element on "index".
         :param index: int 
-        :return: DomainElement
+        :return: DomainElement (it will be int or tuple)
         """
         return self.domain_elements[index]
 
@@ -45,7 +45,7 @@ class SimpleDomain(Domain):
         with list of integers between first and last.
         :param first: int 
         :param last: int
-        :param domain_name: str or None
+        :param domain_name: str
         """
         self.first = first
         self.last = last
@@ -105,6 +105,7 @@ class CompositeDomain(Domain):
     This class represents Domain consisted of multiple
     SimpleDomains. This means that its elements are Cartesian
     product of elements from every SimpleDomain given to it.
+    Its elements will be defined as tuples.
     """
 
     def __init__(self, list_of_domains, domain_name=None):

@@ -1,8 +1,18 @@
 from domain import SimpleDomain
-import numpy
+
 
 class FuzzySet(object):
-
+	"""
+	Parent class for MutableFuzzySet and
+	CalculatedFuzzySet. It contains some basic 
+	functionality for both of these classes.
+	These internal variables should be defined in 
+	children classes:
+	- set_name, domain, memberships
+	User is obligated to defined these
+	variables if they want to use some 
+	methods from FuzzySet class.
+	"""
 	def print_fuzzy_set(self):
 		"""
 		Printing fuzzy set (its domain and
@@ -29,6 +39,11 @@ class FuzzySet(object):
 
 
 class MutableFuzzySet(FuzzySet):
+	"""
+	MutableFuzzySet is a type of FuzzySet which
+	allows you to set memberships values for each
+	domain element.
+	"""
 	def __init__(self, domain, set_name=""):
 		self.domain = domain
 		self.memberships = [0]*len(self.domain.domain_elements)
@@ -36,6 +51,9 @@ class MutableFuzzySet(FuzzySet):
 
 	def set_value_at(self, domain_element, element_value):
 		"""
+		This method allows you to set element_value to
+		domain_element by writing that value on corresponding
+		index in memberships variable.
 		:param domain_element: DomainElement 
 		:param element_value: double
 		:return: MutableFuzzySet
@@ -49,6 +67,9 @@ class MutableFuzzySet(FuzzySet):
 
 def _step_function(domain):
 	"""
+	This is a function that calculates
+	values for domain elements given with
+	argument domain. Function is step. 
 	:param domain: Domain 
 	:return: list of doubles
 	"""
