@@ -34,10 +34,9 @@ def is_symmetric(fuzzy_set):
 	for element in fuzzy_set.domain.domain_elements:
 		a = element[0]
 		b = element[1]
-		index = fuzzy_set.domain.index_of_element(element)
-		index2 = fuzzy_set.domain.index_of_element((b,a))
-		if not fuzzy_set.memberships[index] == fuzzy_set.memberships[index2]:
+		if fuzzy_set.member_dict[element] != fuzzy_set.member_dict[(b, a)]:
 			return False
+		
 	return True
 
 def is_reflexive(fuzzy_set):
@@ -91,6 +90,7 @@ def is_fuzzy_equivalence(fuzzy_set):
 	if not is_max_min_transitive(fuzzy_set):
 		return False
 	return True
+
 
 def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 	"""
