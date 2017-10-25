@@ -1,3 +1,4 @@
+import itertools
 from domain import CompositeDomain
 from domain import SimpleDomain
 from sets import CalculatedFuzzySet
@@ -52,13 +53,66 @@ def is_reflexive(fuzzy_set):
 				return False
 	return True
 
+def is_max_min_transitive(fuzzy_set):
+	"""
+	This function checks if relation given to it (fuzzy_set)
+	is max min transitive.
+	:param fuzzy_set: FuzzySet instance
+	:return: boolean (True or False)
+	"""
+	original_domain_elements = fuzzy_set.domain.list_of_domains[0].domain_elements
+	list_for_cartesian = [original_domain_elements]*3
+
+	for element in itertools.product(*list_for_cartesian):
+		x = element[0]
+		y = element[1]
+		z = element[2]
+
+		mi_xz = fuzzy_set.member_dict[(x, z)]
+		mi_xy = fuzzy_set.member_dict[(x, y)]
+		mi_yz = fuzzy_set.member_dict[(y, z)]
+
+		if mi_xz < min(mi_xy, mi_yz):
+			return False
+
+	return True
+
+def is_fuzzy_equivalence(fuzzy_set):
+	"""
+	Checking if relation "fuzzy_set" is reflexive, symmetric 
+	and max-min transitive.
+	:param fuzzy_set: FuzzySet instance
+	:return: boolean
+	"""
+	if not is_symmetric(fuzzy_set):
+		return False
+	if not is_reflexive(fuzzy_set):
+		return False
+	if not is_max_min_transitive(fuzzy_set):
+		return False
+	return True
+
+def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
+	"""
+	Calculating composition of two relations.
+	:param fuzzy_set1: FuzzySet (defined on domain UxV)
+	:param fuzzy_set2: FuzzySet (defined on domain VxW)
+	:return: FuzzySet (defined on domain UxW)
+	"""
+	domain_elements1 = fuzzy_set1.domain.domain_elements
+	domain_elements2 = fuzzy_set2.domain.domain_elements
+	for element in domain_elements1:
+		my_row = [item for item in domain_elements1 if element[0] == item[0]]
+		for element2 in domain_elements2:
+			my_col = [item for item in domain_elements2 if element2[1] == item[1]]
+			import pdb; pdb.set_trace()
 
 if __name__ == "__main__":
 	simple_domain = SimpleDomain(0, 3, "Pero")
 	simple_domain2 = SimpleDomain(0, 3, "Branko")
 	compos = CompositeDomain([simple_domain, simple_domain2], "Composite")
 	my_set = CalculatedFuzzySet(compos)
-	#print(is_U_times_relation(my_set))
+	# print(is_U_times_relation(my_set))
 
 	mutable_set = MutableFuzzySet(compos)
 	mutable_set.set_value_at((0, 0), 1)
@@ -69,5 +123,15 @@ if __name__ == "__main__":
 	mutable_set.set_value_at((2, 1), 0.71)
 	mutable_set.set_value_at((2, 2), 1)
 
-	#print(is_symmetric(mutable_set))
+	# print(is_symmetric(mutable_set))
 	print(is_reflexive(mutable_set))
+	is_max_min_transitive(mutable_set)
+	prvi = SimpleDomain(0, 2, "Pero")
+	prvi2 = SimpleDomain(0, 3, "Pero")
+	drugi = SimpleDomain(0, 3, "Branko")
+	drugi2 = SimpleDomain(0, 4, "Branko")
+	compos1 = CompositeDomain([prvi, prvi2], "Composite1")
+	compos2 = CompositeDomain([drugi, drugi2], "Composite2")
+	my_fuzz1 = CalculatedFuzzySet(compos1)
+	my_fuzz2 = CalculatedFuzzySet(compos2)
+	composition_of_binary_relations(my_fuzz1, my_fuzz2)

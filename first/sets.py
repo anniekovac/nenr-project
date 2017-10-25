@@ -1,4 +1,5 @@
 from domain import SimpleDomain
+from domain import CompositeDomain
 
 
 class FuzzySet(object):
@@ -48,6 +49,7 @@ class MutableFuzzySet(FuzzySet):
 		self.domain = domain
 		self.memberships = [0]*len(self.domain.domain_elements)
 		self.set_name = set_name
+		self.member_dict = dict([(item, 0) for item in self.domain.domain_elements])
 
 	def set_value_at(self, domain_element, element_value):
 		"""
@@ -62,6 +64,7 @@ class MutableFuzzySet(FuzzySet):
 			raise ValueError("Trying to set incorrect value! Try any value between 0 and 1.")
 		index = self.domain.index_of_element(domain_element)
 		self.memberships[index] = element_value
+		self.member_dict[domain_element] = element_value
 		return self
 
 
@@ -191,9 +194,12 @@ class CalculatedFuzzySet(FuzzySet):
 
 	def __init__(self, domain, my_func="gamma", set_name=""):
 		self.domain = domain
+		self.member_dict = dict([(item, 0) for item in self.domain.domain_elements])
 		self.unitary_function = unitary_function
 		self.memberships = self.unitary_function(self.domain, my_func)
+		self.member_dict = dict([(domain_element, value) for (domain_element, value) in zip(self.domain.domain_elements, self.memberships)])
 		self.set_name = set_name
+
 
 if __name__ == "__main__":
 	simple_domain = SimpleDomain(1, 40, "Pero")
@@ -209,3 +215,7 @@ if __name__ == "__main__":
 	# 	print("Index: {}, Element domene: {}, Vrijednost: {}".format(index, simple_domain.domain_elements[index], item))
 
 	my_calculated = CalculatedFuzzySet(simple_domain)
+	simp1 = SimpleDomain(1, 5, "bla")
+	simp2 = SimpleDomain(1, 5, "bla2")
+	my_comp = CompositeDomain([simp1, simp2])
+	my_calc = CalculatedFuzzySet(my_comp)
