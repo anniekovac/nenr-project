@@ -105,8 +105,8 @@ def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 
 	u = fuzzy_set1.domain.get_component(0).domain_elements
 	w = fuzzy_set2.domain.get_component(1).domain_elements
-	u_domain = SimpleDomain(u[0], u[-1])
-	w_domain = SimpleDomain(w[0], w[-1])
+	u_domain = SimpleDomain(u[0], u[-1]+1)
+	w_domain = SimpleDomain(w[0], w[-1]+1)
 
 	len_u = len(u)
 	len_w = len(w)
@@ -134,25 +134,13 @@ def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 		composition_fuzzy.set_value_at((x, y), value)
 	return composition_fuzzy
 
-if __name__ == "__main__":
-	simple_domain = SimpleDomain(0, 3, "Pero")
-	simple_domain2 = SimpleDomain(0, 3, "Branko")
-	compos = CompositeDomain([simple_domain, simple_domain2], "Composite")
-	my_set = CalculatedFuzzySet(compos)
-	# print(is_U_times_relation(my_set))
-
-	mutable_set = MutableFuzzySet(compos)
-	mutable_set.set_value_at((0, 0), 1)
-	mutable_set.set_value_at((0, 1), 0.5)
-	mutable_set.set_value_at((1, 0), 0.5)
-	mutable_set.set_value_at((1, 1), 1)
-	mutable_set.set_value_at((1, 2), 0.7)
-	mutable_set.set_value_at((2, 1), 0.71)
-	mutable_set.set_value_at((2, 2), 1)
-
-	# print(is_symmetric(mutable_set))
-	print(is_reflexive(mutable_set))
-	is_max_min_transitive(mutable_set)
+def test_composition():
+	"""
+	Test made for testing composition of 
+	binary relations. Test is based 
+	on example from slides (example from ha-03b slide 29/66).
+	:return: None
+	"""
 	prvi = SimpleDomain(0, 3, "Pero")
 	prvi2 = SimpleDomain(0, 4, "Pero")
 	drugi = SimpleDomain(0, 4, "Branko")
@@ -188,3 +176,24 @@ if __name__ == "__main__":
 	my_fuzz2.set_value_at((3, 1), 0.4)
 
 	composition_of_binary_relations(my_fuzz1, my_fuzz2)
+
+if __name__ == "__main__":
+	simple_domain = SimpleDomain(0, 3, "Pero")
+	simple_domain2 = SimpleDomain(0, 3, "Branko")
+	compos = CompositeDomain([simple_domain, simple_domain2], "Composite")
+	my_set = CalculatedFuzzySet(compos)
+	# print(is_U_times_relation(my_set))
+
+	mutable_set = MutableFuzzySet(compos)
+	mutable_set.set_value_at((0, 0), 1)
+	mutable_set.set_value_at((0, 1), 0.5)
+	mutable_set.set_value_at((1, 0), 0.5)
+	mutable_set.set_value_at((1, 1), 1)
+	mutable_set.set_value_at((1, 2), 0.7)
+	mutable_set.set_value_at((2, 1), 0.71)
+	mutable_set.set_value_at((2, 2), 1)
+
+	# print(is_symmetric(mutable_set))
+	print(is_reflexive(mutable_set))
+	is_max_min_transitive(mutable_set)
+	test_composition()
