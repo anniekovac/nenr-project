@@ -100,36 +100,72 @@ def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 	:param fuzzy_set2: FuzzySet (defined on domain VxW)
 	:return: FuzzySet (defined on domain UxW)
 	"""
+	# extracting domain elements of both sets
 	domain_elements1 = fuzzy_set1.domain.domain_elements
 	domain_elements2 = fuzzy_set2.domain.domain_elements
 
+	# defining UxW space in which composition will be defined
 	u = fuzzy_set1.domain.get_component(0).domain_elements
 	w = fuzzy_set2.domain.get_component(1).domain_elements
+
+	# creating two SimpleDomain instances which will
+	# create CompositeDomain
+
+	# REMINDER: SimpleDomain(first, last) does NOT
+	# include last element, so there is +1 (so it will be included)
 	u_domain = SimpleDomain(u[0], u[-1]+1)
 	w_domain = SimpleDomain(w[0], w[-1]+1)
 
 	len_u = len(u)
 	len_w = len(w)
+
+	# creating empty array in domain UxW filled with zeros
 	my_array = numpy.zeros(shape=(len_u, len_w))
+
+	# iterating over domain elements of first part of
+	# composite domain
 	for element in domain_elements1:
+
+		# extracting row
 		my_row = [item for item in domain_elements1 if element[0] == item[0]]
 
+		# iterating over domain elements of second part of composite domain
 		for element2 in domain_elements2:
+
+			# extracting column
 			my_col = [item for item in domain_elements2 if element2[1] == item[1]]
 
+			# extracting row and column values (these are the values
+			# that we will consider in finding maximum of minimum)
 			row_values = [fuzzy_set1.member_dict[item] for item in my_row]
 			col_values = [fuzzy_set2.member_dict[item] for item in my_col]
 
+			# initializing max_min value to zero
 			max_min = 0
 			for row, col in zip(row_values, col_values):
+				# if min(row, col) is larger than
+				# current max_min, then set max_min to
+				# to new value
 				if min(row, col) > max_min:
 					max_min = min(row, col)
 
+			# my index has the row index from the first element,
+			# and column index from the second element
 			my_index = (element[0], element2[1])
+
+			# set element in my_array on index element[0], element2[1]
+			# to this calculated max_min value
 			my_array[element[0], element2[1]] = max_min
 
+	# creating composite domain out of two simple domains
+	# created in the beginning
 	compos_domain = CompositeDomain([u_domain, w_domain])
+
+	# initializing MutableFuzzy set with compos_domain UxW
 	composition_fuzzy = MutableFuzzySet(compos_domain)
+
+	# writing calculated values to new composition_fuzzy
+	# FuzzySet
 	for (x, y), value in numpy.ndenumerate(my_array):
 		composition_fuzzy.set_value_at((x, y), value)
 	return composition_fuzzy
