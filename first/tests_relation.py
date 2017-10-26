@@ -3,6 +3,71 @@ from domain import SimpleDomain
 from sets import MutableFuzzySet
 from relation import composition_of_binary_relations
 from relation import is_fuzzy_equivalence
+from relation import is_U_times_relation, is_max_min_transitive
+from relation import is_reflexive, is_symmetric
+
+
+def test_relation_characteristics():
+	"""
+	Test made for testing characteristics of fuzzy relations.
+	This test will test most of the functions from relation.py
+	that return boolean.
+	:return: None
+	"""
+	u = SimpleDomain(1, 6)
+	u2 = CompositeDomain([u, u])
+
+	r1 = MutableFuzzySet(u2)
+	r1.set_value_at((1, 1), 1)
+	r1.set_value_at((2, 2), 1)
+	r1.set_value_at((3, 3), 1)
+	r1.set_value_at((4, 4), 1)
+	r1.set_value_at((5, 5), 1)
+	r1.set_value_at((3, 1), 0.5)
+	r1.set_value_at((1, 3), 0.5)
+
+	r2 = MutableFuzzySet(u2)
+	r2.set_value_at((1, 1), 1)
+	r2.set_value_at((2, 2), 1)
+	r2.set_value_at((3, 3), 1)
+	r2.set_value_at((4, 4), 1)
+	r2.set_value_at((5, 5), 1)
+	r2.set_value_at((3, 1), 0.5)
+	r2.set_value_at((1, 3), 0.1)
+
+	r3 = MutableFuzzySet(u2)
+	r3.set_value_at((1, 1), 1)
+	r3.set_value_at((2, 2), 1)
+	r3.set_value_at((3, 3), 0.3)
+	r3.set_value_at((4, 4), 1)
+	r3.set_value_at((5, 5), 1)
+	r3.set_value_at((1, 2), 0.6)
+	r3.set_value_at((2, 1), 0.6)
+	r3.set_value_at((2, 3), 0.7)
+	r3.set_value_at((3, 2), 0.7)
+	r3.set_value_at((3, 1), 0.5)
+	r3.set_value_at((1, 3), 0.5)
+
+	r4 = MutableFuzzySet(u2)
+	r4.set_value_at((1, 1), 1)
+	r4.set_value_at((2, 2), 1)
+	r4.set_value_at((3, 3), 1)
+	r4.set_value_at((4, 4), 1)
+	r4.set_value_at((5, 5), 1)
+	r4.set_value_at((1, 2), 0.4)
+	r4.set_value_at((2, 1), 0.4)
+	r4.set_value_at((2, 3), 0.5)
+	r4.set_value_at((3, 2), 0.5)
+	r4.set_value_at((1, 3), 0.4)
+	r4.set_value_at((3, 1), 0.4)
+
+	print("r1 je definiran nad UxU: {}".format(is_U_times_relation(r1)))
+	print("r1 je simetricna: {}".format(is_symmetric(r1)))
+	print("r2 je simetricna: {}".format(is_symmetric(r2)))
+	print("r1 je refleksivna: {}".format(is_reflexive(r1)))
+	print("r3 je refleksivna: {}".format(is_reflexive(r3)))
+	print("r3 je max-min tranzitivna: {}".format(is_max_min_transitive(r3)))
+	print("r4 je max-min tranzitivna: {}".format(is_max_min_transitive(r4)))
 
 
 def test_composition():

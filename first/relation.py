@@ -177,6 +177,7 @@ def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 
 if __name__ == "__main__":
 
-	tests_relation.test_composition()
-	tests_relation.test_composition2()
-	tests_relation.test_equivalence()
+	tests_relation.test_relation_characteristics()
+	# tests_relation.test_composition()
+	# tests_relation.test_composition2()
+	# tests_relation.test_equivalence()
