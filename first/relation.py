@@ -104,9 +104,9 @@ def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 	domain_elements2 = fuzzy_set2.domain.domain_elements
 
 	u = fuzzy_set1.domain.get_component(0).domain_elements
-	v = fuzzy_set1.domain.get_component(1).domain_elements
-	v = fuzzy_set2.domain.get_component(0).domain_elements
 	w = fuzzy_set2.domain.get_component(1).domain_elements
+	u_domain = SimpleDomain(u[0], u[-1])
+	w_domain = SimpleDomain(w[0], w[-1])
 
 	len_u = len(u)
 	len_w = len(w)
@@ -126,9 +126,13 @@ def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 					max_min = min(row, col)
 
 			my_index = (element[0], element2[1])
-			#print("element: {}, element2 : {}, my_index: {}, max_min : {}".format(element, element2, my_index, max_min))
 			my_array[element[0], element2[1]] = max_min
-	import pdb; pdb.set_trace()
+
+	compos_domain = CompositeDomain([u_domain, w_domain])
+	composition_fuzzy = MutableFuzzySet(compos_domain)
+	for (x, y), value in numpy.ndenumerate(my_array):
+		composition_fuzzy.set_value_at((x, y), value)
+	return composition_fuzzy
 
 if __name__ == "__main__":
 	simple_domain = SimpleDomain(0, 3, "Pero")
@@ -149,12 +153,38 @@ if __name__ == "__main__":
 	# print(is_symmetric(mutable_set))
 	print(is_reflexive(mutable_set))
 	is_max_min_transitive(mutable_set)
-	prvi = SimpleDomain(0, 2, "Pero")
-	prvi2 = SimpleDomain(0, 3, "Pero")
-	drugi = SimpleDomain(0, 3, "Branko")
-	drugi2 = SimpleDomain(0, 4, "Branko")
+	prvi = SimpleDomain(0, 3, "Pero")
+	prvi2 = SimpleDomain(0, 4, "Pero")
+	drugi = SimpleDomain(0, 4, "Branko")
+	drugi2 = SimpleDomain(0, 2, "Branko")
 	compos1 = CompositeDomain([prvi, prvi2], "Composite1")
 	compos2 = CompositeDomain([drugi, drugi2], "Composite2")
-	my_fuzz1 = CalculatedFuzzySet(compos1)
-	my_fuzz2 = CalculatedFuzzySet(compos2)
+
+	# example from ha-03b slide 29/66
+	my_fuzz1 = MutableFuzzySet(compos1)
+	my_fuzz2 = MutableFuzzySet(compos2)
+
+	my_fuzz1.set_value_at((0, 0), 0.1)
+	my_fuzz1.set_value_at((0, 1), 0.7)
+	my_fuzz1.set_value_at((0, 2), 0.5)
+	my_fuzz1.set_value_at((0, 3), 0.1)
+	my_fuzz1.set_value_at((1, 0), 0.5)
+	my_fuzz1.set_value_at((1, 1), 1.0)
+	my_fuzz1.set_value_at((1, 2), 0.9)
+	my_fuzz1.set_value_at((1, 3), 0.4)
+	my_fuzz1.set_value_at((1, 3), 0.4)
+	my_fuzz1.set_value_at((2, 0), 0.2)
+	my_fuzz1.set_value_at((2, 1), 0.1)
+	my_fuzz1.set_value_at((2, 2), 0.6)
+	my_fuzz1.set_value_at((2, 3), 0.9)
+
+	my_fuzz2.set_value_at((0, 0), 1.0)
+	my_fuzz2.set_value_at((0, 1), 0.2)
+	my_fuzz2.set_value_at((1, 0), 0.7)
+	my_fuzz2.set_value_at((1, 1), 0.5)
+	my_fuzz2.set_value_at((2, 0), 0.3)
+	my_fuzz2.set_value_at((2, 1), 0.9)
+	my_fuzz2.set_value_at((3, 0), 0.0)
+	my_fuzz2.set_value_at((3, 1), 0.4)
+
 	composition_of_binary_relations(my_fuzz1, my_fuzz2)
