@@ -116,8 +116,8 @@ def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 	u_domain = SimpleDomain(u[0], u[-1]+1)
 	w_domain = SimpleDomain(w[0], w[-1]+1)
 
-	len_u = len(u)
-	len_w = len(w)
+	len_u = len(u)+1
+	len_w = len(w)+1
 
 	# creating empty array in domain UxW filled with zeros
 	my_array = numpy.zeros(shape=(len_u, len_w))
@@ -167,7 +167,10 @@ def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 	# writing calculated values to new composition_fuzzy
 	# FuzzySet
 	for (x, y), value in numpy.ndenumerate(my_array):
-		composition_fuzzy.set_value_at((x, y), value)
+		try:
+			composition_fuzzy.set_value_at((x, y), value)
+		except ValueError:
+			pass
 	return composition_fuzzy
 
 def test_composition():
@@ -177,10 +180,10 @@ def test_composition():
 	on example from slides (example from ha-03b slide 29/66).
 	:return: None
 	"""
-	prvi = SimpleDomain(0, 3, "Pero")
-	prvi2 = SimpleDomain(0, 4, "Pero")
-	drugi = SimpleDomain(0, 4, "Branko")
-	drugi2 = SimpleDomain(0, 2, "Branko")
+	prvi = SimpleDomain(0, 4, "Pero")
+	prvi2 = SimpleDomain(0, 5, "Pero")
+	drugi = SimpleDomain(0, 5, "Branko")
+	drugi2 = SimpleDomain(0, 3, "Branko")
 	compos1 = CompositeDomain([prvi, prvi2], "Composite1")
 	compos2 = CompositeDomain([drugi, drugi2], "Composite2")
 
@@ -213,6 +216,59 @@ def test_composition():
 
 	composition_of_binary_relations(my_fuzz1, my_fuzz2)
 
+def test_composition2():
+	u1 = SimpleDomain(1, 5)
+	u2 = SimpleDomain(1, 4)
+	u3 = SimpleDomain(1, 5)
+
+	u1u2 = CompositeDomain([u1, u2])
+	r1 = MutableFuzzySet(u1u2)
+	r1.set_value_at((1, 1), 0.3)
+	r1.set_value_at((1, 2), 1)
+	r1.set_value_at((3, 3), 0.5)
+	r1.set_value_at((4, 3), 0.5)
+
+	u2u3 = CompositeDomain([u2, u3])
+	r2 = MutableFuzzySet(u2u3)
+	r2.set_value_at((1, 1), 1)
+	r2.set_value_at((2, 1), 0.5)
+	r2.set_value_at((2, 2), 0.7)
+	r2.set_value_at((3, 3), 1)
+	r2.set_value_at((3, 4), 0.4)
+
+	my_composition = composition_of_binary_relations(r1, r2)
+	for domain_element in my_composition.domain.domain_elements:
+		print("mu({}) = {}".format(domain_element, my_composition.get_value_at(domain_element)))
+
+def test_equivalence():
+	u = SimpleDomain(1, 5)
+	uu = CompositeDomain([u, u])
+	r = MutableFuzzySet(uu)
+	r.set_value_at((1, 1), 1)
+	r.set_value_at((2, 2), 1)
+	r.set_value_at((3, 3), 1)
+	r.set_value_at((4, 4), 1)
+	r.set_value_at((1, 2), 0.3)
+	r.set_value_at((2, 1), 0.3)
+	r.set_value_at((2, 3), 0.5)
+	r.set_value_at((3, 2), 0.5)
+	r.set_value_at((3, 4), 0.2)
+	r.set_value_at((4, 3), 0.2)
+
+	r2 = r
+
+	print("Pocetna relacija je neizrazita relacija ekvivalencije? {}".format(is_fuzzy_equivalence(r)))
+
+	for i in range(1, 3):
+		r2 = composition_of_binary_relations(r2, r)
+		print("Broj odradjenih kompozicija: {}".format(i))
+		print("Relacija je: ")
+
+		for domain_element in r2.domain.domain_elements:
+			print("mu({}) = {}".format(domain_element, r2.get_value_at(domain_element)))
+
+		print("Ova relacija je neizrazita relacija ekvivalencije? {}".format(is_fuzzy_equivalence(r2)))
+
 if __name__ == "__main__":
 	simple_domain = SimpleDomain(0, 3, "Pero")
 	simple_domain2 = SimpleDomain(0, 3, "Branko")
@@ -230,6 +286,8 @@ if __name__ == "__main__":
 	mutable_set.set_value_at((2, 2), 1)
 
 	# print(is_symmetric(mutable_set))
-	print(is_reflexive(mutable_set))
-	is_max_min_transitive(mutable_set)
-	test_composition()
+	#print(is_reflexive(mutable_set))
+	#is_max_min_transitive(mutable_set)
+	#test_composition()
+	#test_composition2()
+	test_equivalence()
