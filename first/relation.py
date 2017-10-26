@@ -1,4 +1,5 @@
 import itertools
+import numpy
 from domain import CompositeDomain
 from domain import SimpleDomain
 from sets import CalculatedFuzzySet
@@ -36,7 +37,7 @@ def is_symmetric(fuzzy_set):
 		b = element[1]
 		if fuzzy_set.member_dict[element] != fuzzy_set.member_dict[(b, a)]:
 			return False
-		
+
 	return True
 
 def is_reflexive(fuzzy_set):
@@ -101,11 +102,33 @@ def composition_of_binary_relations(fuzzy_set1, fuzzy_set2):
 	"""
 	domain_elements1 = fuzzy_set1.domain.domain_elements
 	domain_elements2 = fuzzy_set2.domain.domain_elements
+
+	u = fuzzy_set1.domain.get_component(0).domain_elements
+	v = fuzzy_set1.domain.get_component(1).domain_elements
+	v = fuzzy_set2.domain.get_component(0).domain_elements
+	w = fuzzy_set2.domain.get_component(1).domain_elements
+
+	len_u = len(u)
+	len_w = len(w)
+	my_array = numpy.zeros(shape=(len_u, len_w))
 	for element in domain_elements1:
 		my_row = [item for item in domain_elements1 if element[0] == item[0]]
+
 		for element2 in domain_elements2:
 			my_col = [item for item in domain_elements2 if element2[1] == item[1]]
-			import pdb; pdb.set_trace()
+
+			row_values = [fuzzy_set1.member_dict[item] for item in my_row]
+			col_values = [fuzzy_set2.member_dict[item] for item in my_col]
+
+			max_min = 0
+			for row, col in zip(row_values, col_values):
+				if min(row, col) > max_min:
+					max_min = min(row, col)
+
+			my_index = (element[0], element2[1])
+			#print("element: {}, element2 : {}, my_index: {}, max_min : {}".format(element, element2, my_index, max_min))
+			my_array[element[0], element2[1]] = max_min
+	import pdb; pdb.set_trace()
 
 if __name__ == "__main__":
 	simple_domain = SimpleDomain(0, 3, "Pero")
