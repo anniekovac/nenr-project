@@ -42,6 +42,7 @@ def is_symmetric(fuzzy_set):
 
 	return True
 
+
 def is_reflexive(fuzzy_set):
 	"""
 	This function should check if relation given to 

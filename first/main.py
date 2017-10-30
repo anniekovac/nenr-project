@@ -4,6 +4,6 @@ if __name__ == "__main__":
 	nums_from_input = [int(char) for char in my_input if char.isdigit()]
 
 	if len(nums_from_input) != 6:
-		raise ValueError("Your input is invalid!")
+		raise ValueError("Your input is invalid, you have to enter exactly 6 numbers!")
 
 	L, D, LK, DK, V, S = nums_from_input

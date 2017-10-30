@@ -10,7 +10,7 @@ class FuzzySet(object):
 	These internal variables should be defined in 
 	children classes:
 	- set_name, domain, memberships
-	User is obligated to defined these
+	User is obligated to define these
 	variables if they want to use some 
 	methods from FuzzySet class.
 	"""
@@ -78,6 +78,8 @@ def _step_function(domain):
 	"""
 	# this is approximately the middle
 	middle = int(float(len(domain.domain_elements))/2)
+	# output list will have values 0 till the middle index, and after it there
+	# will be values of 1
 	output_list = [0 if index < middle else 1 for (index, element) in enumerate(domain.domain_elements)]
 	return output_list
 
@@ -176,10 +178,10 @@ def unitary_function(domain, func_name="gamma"):
 	"""
 	function_dict = {
 
-		"step" : _step_function(domain),
-		"gamma" : _gamma_function(domain),
-		"lambda" : _lambda_function(domain),
-		"l" : _l_function(domain)
+		"step": _step_function(domain),
+		"gamma": _gamma_function(domain),
+		"lambda": _lambda_function(domain),
+		"l": _l_function(domain)
 	}
 	return function_dict[func_name]
 

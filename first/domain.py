@@ -10,6 +10,7 @@ class Domain(object):
     # variable defined here locally,
     # but it is assumed that this variable
     # should also be defined in lower classes
+    # that inherit this class
     # (SimpleDomain and CompositeDomain)
     domain_elements = []
 
@@ -35,7 +36,7 @@ class SimpleDomain(Domain):
     """
     Class that represents simple domain of 
     integer numbers between two integers: first and
-    last.
+    last. Variable "last" is NOT included in domain.
     """
 
     def __init__(self, first, last, domain_name=""):
