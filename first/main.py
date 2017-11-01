@@ -1,3 +1,24 @@
+from fuzzy_control import fuzzyfication, plot_fuzzy_set
+
+
+def fuzzy_magic(nums_from_input):
+	"""
+	This is where all the magic happens.
+	:param nums_from_input: [int] (list of ints from standard input)
+	:return: None
+	"""
+	L, D, LK, DK, V, S = nums_from_input
+	distance_domain = (0, 1301)
+	fuzzy_setL = fuzzyfication(L, *distance_domain)
+	fuzzy_setD = fuzzyfication(D, *distance_domain)
+	fuzzy_setLK = fuzzyfication(LK, *distance_domain)
+	fuzzy_setDK = fuzzyfication(DK, *distance_domain)
+
+	fuzzy_setS = fuzzyfication(S, 0, 2)
+	fuzzy_setV = fuzzyfication(V, 20, 51)
+	plot_fuzzy_set(fuzzy_setL)
+
+
 if __name__ == "__main__":
 
 	while True:
@@ -6,8 +27,12 @@ if __name__ == "__main__":
 		my_input = input("Please enter L D LK DK V S in this order:")
 		if "KRAJ" in my_input:
 			break
-		nums_from_input = [int(char) for char in my_input if char.isdigit()]
-		L, D, LK, DK, V, S = nums_from_input
+		nums_from_input = [int(s) for s in my_input.split(" ") if s.isdigit()]
+		#import pdb; pdb.set_trace()
+		fuzzy_magic(nums_from_input)
+
+
+
 
 		# L - udaljenost broda od obale prema lijevo
 		# D - udaljenost broda od obale prema desno
