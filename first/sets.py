@@ -198,12 +198,17 @@ class CalculatedFuzzySet(FuzzySet):
 		self.domain = domain
 		self.member_dict = dict([(item, 0) for item in self.domain.domain_elements])
 		self.unitary_function = unitary_function
-		self.set_calculated_memberships(my_func)
-		self.member_dict = dict([(domain_element, value) for (domain_element, value) in zip(self.domain.domain_elements, self.memberships)])
+		#self.set_calculated_memberships(my_func)
 		self.set_name = set_name
 
 	def set_calculated_memberships(self, my_func):
+		"""
+		Function for setting membership values to CalculatedFuzzySet.
+		:param my_func: str ("step" or "gamma" etc)
+		:return: None
+		"""
 		self.memberships = self.unitary_function(self.domain, my_func)
+		self.member_dict = dict([(domain_element, value) for (domain_element, value) in zip(self.domain.domain_elements, self.memberships)])
 
 if __name__ == "__main__":
 	simple_domain = SimpleDomain(1, 40, "Pero")
