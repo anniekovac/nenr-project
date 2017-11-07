@@ -51,17 +51,17 @@ class Rule(CalculatedFuzzySet):
 	"""
 	Domena se definira izvan pravila, te se zatim zove pravilo.
 	"""
-	def __init__(self, domain, my_func):
-		CalculatedFuzzySet.__init__(self, domain)
-		self.memberships = self.set_calculated_memberships(my_func)
+	def __init__(self, domain, my_func, **kwargs):
+		CalculatedFuzzySet.__init__(self, domain, my_func)
+		self.set_calculated_memberships(my_func, **kwargs)
 
 
 if __name__ == "__main__":
 	# domena ovisi o tome je li pravilo za akceleraciju
 	# ili za kut
 	angle_domain = SimpleDomain(-90, 91)
-	my_angle_rule = Rule(angle_domain, )
+	my_angle_rule = Rule(angle_domain, "l", alpha=0.2, beta=0.8)
 	my_singleton = 2
 	my_fuzzyficated = fuzzyfication(my_singleton, 0, 5)
-	# plot_fuzzy_set(my_angle_rule)
+	plot_fuzzy_set(my_angle_rule)
 	# print(defuzzyfication(my_angle_rule))

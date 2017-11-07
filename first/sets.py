@@ -83,7 +83,7 @@ def _step_function(domain):
 	output_list = [0 if index < middle else 1 for (index, element) in enumerate(domain.domain_elements)]
 	return output_list
 
-def _gamma_function(domain):
+def _gamma_function(domain, **kwargs):
 	"""
 	Implementation of gamma function.
 	It returns list of values that corresponds
@@ -94,8 +94,8 @@ def _gamma_function(domain):
 	:return: list of doubles
 	"""
 	domain_len = len(domain.domain_elements)
-	alpha = int(0.3*domain_len)
-	beta = int(0.6*domain_len)
+	alpha = int(kwargs['alpha']*domain_len)
+	beta = int(kwargs['beta']*domain_len)
 	output_list = [0]*domain_len
 
 	for index, element in enumerate(domain.domain_elements):
@@ -110,7 +110,7 @@ def _gamma_function(domain):
 	return output_list
 
 
-def _lambda_function(domain):
+def _lambda_function(domain, **kwargs):
 	"""
 	Implementation of lambda function.
 	It returns list of values that corresponds
@@ -121,9 +121,12 @@ def _lambda_function(domain):
 	:return: list of doubles
 	"""
 	domain_len = len(domain.domain_elements)
-	alpha = int(0.25*domain_len)
-	beta = int(0.5*domain_len)
-	gamma = int(0.75*domain_len)
+	alpha = int(kwargs['alpha'] * domain_len)
+	beta = int(kwargs['beta'] * domain_len)
+	try:
+		gamma = int(kwargs['gamma'] * domain_len)
+	except KeyError:
+		gamma = int(0.75 * domain_len)
 	output_list = [0]*domain_len
 
 	for index, element in enumerate(domain.domain_elements):
@@ -140,7 +143,7 @@ def _lambda_function(domain):
 	return output_list
 
 
-def _l_function(domain):
+def _l_function(domain, **kwargs):
 	"""
 	Implementation of L function.
 	It returns list of values that corresponds
@@ -151,8 +154,8 @@ def _l_function(domain):
 	:return: list of doubles
 	"""
 	domain_len = len(domain.domain_elements)
-	alpha = int(0.3*domain_len)
-	beta = int(0.6*domain_len)
+	alpha = int(kwargs['alpha']*domain_len)
+	beta = int(kwargs['beta']*domain_len)
 	output_list = [0]*domain_len
 
 	for index, element in enumerate(domain.domain_elements):
@@ -167,7 +170,7 @@ def _l_function(domain):
 	return output_list
 
 
-def unitary_function(domain, func_name="gamma"):
+def unitary_function(domain, func_name, **kwargs):
 	"""
 	Setting double values to a list based on
 	domain.domain_elements list.
@@ -179,9 +182,9 @@ def unitary_function(domain, func_name="gamma"):
 	function_dict = {
 
 		"step": _step_function(domain),
-		"gamma": _gamma_function(domain),
-		"lambda": _lambda_function(domain),
-		"l": _l_function(domain)
+		"gamma": _gamma_function(domain, **kwargs),
+		"lambda": _lambda_function(domain, **kwargs),
+		"l": _l_function(domain, **kwargs)
 	}
 	return function_dict[func_name]
 
@@ -194,21 +197,22 @@ class CalculatedFuzzySet(FuzzySet):
 	will be distributed across the domain of the FuzzySet.
 	"""
 
-	def __init__(self, domain, my_func="gamma", set_name=""):
+	def __init__(self, domain, my_func, set_name=""):
 		self.domain = domain
+		self.my_func = my_func
 		self.member_dict = dict([(item, 0) for item in self.domain.domain_elements])
 		self.unitary_function = unitary_function
 		self.memberships = [0] * len(self.domain.domain_elements)
 		self.set_name = set_name
 
-	def set_calculated_memberships(self, my_func):
+	def set_calculated_memberships(self, my_func, **kwargs):
 		"""
 		Function for setting membership values to CalculatedFuzzySet.
 		:param my_func: str ("step" or "gamma" etc)
 		:return: None
 		"""
 		try:
-			self.memberships = self.unitary_function(self.domain, my_func)
+			self.memberships = unitary_function(self.domain, self.my_func, **kwargs)
 		except KeyError:
 			self.memberships = my_func(self.domain)
 		self.member_dict = dict([(domain_element, value) for (domain_element, value) in zip(self.domain.domain_elements, self.memberships)])
