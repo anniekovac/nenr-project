@@ -1,5 +1,6 @@
-from fuzzy_control import fuzzyfication, plot_fuzzy_set
-
+from fuzzy_control import fuzzyfication, plot_fuzzy_set, Rule
+from domain import SimpleDomain
+from sets import CalculatedFuzzySet
 
 def fuzzy_magic(nums_from_input):
 	"""
@@ -16,7 +17,16 @@ def fuzzy_magic(nums_from_input):
 
 	fuzzy_setS = fuzzyfication(S, 0, 2)
 	fuzzy_setV = fuzzyfication(V, 20, 51)
-	plot_fuzzy_set(fuzzy_setL)
+	#plot_fuzzy_set(fuzzy_setL)
+
+	angle_domain = SimpleDomain(-90, 91)
+	distance_domain = SimpleDomain(0, 1301)
+	dangerously_close = CalculatedFuzzySet(distance_domain, "l")
+	dangerously_close.set_calculated_memberships("l", alpha=0.1, beta=0.7)
+	close = CalculatedFuzzySet(distance_domain, "l")
+	close.set_calculated_memberships("l", alpha=0.4, beta=0.7)
+	#plot_fuzzy_set(close)
+	my_rule = Rule(angle_domain, L=fuzzy_setL, LK=fuzzy_setLK)
 
 
 if __name__ == "__main__":
@@ -28,7 +38,6 @@ if __name__ == "__main__":
 		if "KRAJ" in my_input:
 			break
 		nums_from_input = [int(s) for s in my_input.split(" ") if s.isdigit()]
-		#import pdb; pdb.set_trace()
 		fuzzy_magic(nums_from_input)
 
 

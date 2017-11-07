@@ -51,17 +51,33 @@ class Rule(CalculatedFuzzySet):
 	"""
 	Domena se definira izvan pravila, te se zatim zove pravilo.
 	"""
-	def __init__(self, domain, my_func, **kwargs):
-		CalculatedFuzzySet.__init__(self, domain, my_func)
-		self.set_calculated_memberships(my_func, **kwargs)
+	def __init__(self, domain, **kwargs):
+		"""
+		:param domain: Domain class instance 
+		:param kwargs: FuzzySets (for example "L", "DK" etc)
+		"""
+		CalculatedFuzzySet.__init__(self, domain)
+		#import pdb; pdb.set_trace()
+
+
 
 
 if __name__ == "__main__":
-	# domena ovisi o tome je li pravilo za akceleraciju
-	# ili za kut
+
 	angle_domain = SimpleDomain(-90, 91)
-	my_angle_rule = Rule(angle_domain, "l", alpha=0.2, beta=0.8)
-	my_singleton = 2
-	my_fuzzyficated = fuzzyfication(my_singleton, 0, 5)
-	plot_fuzzy_set(my_angle_rule)
-	# print(defuzzyfication(my_angle_rule))
+	distance_domain = SimpleDomain(0, 1301)
+	dangerously_close = CalculatedFuzzySet(distance_domain)
+	dangerously_close.set_calculated_memberships("l", alpha=0.1, beta=0.7)
+	close = CalculatedFuzzySet(distance_domain, "l")
+	close.set_calculated_memberships("l", alpha=0.4, beta=0.7)
+
+	# pozitivni kutevi uzrokuju skretanje ulijevo
+	# negativni kutevi uzrokuju skretanje udesno
+	sharp_right = CalculatedFuzzySet(angle_domain)
+	sharp_right.set_calculated_memberships("l", alpha=0.2, beta=0.4)
+	sharp_left = CalculatedFuzzySet(angle_domain)
+	sharp_left.set_calculated_memberships("gamma", alpha=0.6, beta=0.8)
+	plot_fuzzy_set(sharp_left)
+
+
+

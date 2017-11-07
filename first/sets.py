@@ -197,9 +197,9 @@ class CalculatedFuzzySet(FuzzySet):
 	will be distributed across the domain of the FuzzySet.
 	"""
 
-	def __init__(self, domain, my_func, set_name=""):
+	def __init__(self, domain, set_name=""):
 		self.domain = domain
-		self.my_func = my_func
+		#self.my_func = my_func
 		self.member_dict = dict([(item, 0) for item in self.domain.domain_elements])
 		self.unitary_function = unitary_function
 		self.memberships = [0] * len(self.domain.domain_elements)
@@ -212,7 +212,7 @@ class CalculatedFuzzySet(FuzzySet):
 		:return: None
 		"""
 		try:
-			self.memberships = unitary_function(self.domain, self.my_func, **kwargs)
+			self.memberships = unitary_function(self.domain, my_func, **kwargs)
 		except KeyError:
 			self.memberships = my_func(self.domain)
 		self.member_dict = dict([(domain_element, value) for (domain_element, value) in zip(self.domain.domain_elements, self.memberships)])
