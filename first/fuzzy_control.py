@@ -1,7 +1,8 @@
 from matplotlib import pyplot
 from sets import MutableFuzzySet, CalculatedFuzzySet
-from domain import SimpleDomain, CompositeDomain
-from operations import zadeh_not
+from domain import SimpleDomain
+from operations import zadeh_or
+from fuzzy_inputs import *
 
 
 def plot_fuzzy_set(fuzzy_set, y_axis_title="Membership function", x_axis_title="Domain"):
@@ -50,10 +51,6 @@ def defuzzyfication(fuzzy_set):
 
 
 class Rule(CalculatedFuzzySet):
-	"""
-	Domena se definira izvan pravila, te se zatim zove pravilo.
-	"""
-
 	def __init__(self, domain, **kwargs):
 		"""
 		:param domain: Domain class instance 
@@ -81,53 +78,35 @@ class Rule(CalculatedFuzzySet):
 		fuzzy_rule.update_member_dict()
 
 
-if __name__ == "__main__":
-	# defining domains
-	angle_domain = SimpleDomain(-90, 91)
-	distance_domain = SimpleDomain(0, 701)  # it is enough for distance domain to have 700 pixels
-	velocity_domain = SimpleDomain(20, 51)
-	direction_domain = SimpleDomain(0, 2)
-	acceleration_domain = SimpleDomain(-10, 11)
+class AccRuleBase(object):
+	def __init__(self):
+		self.instant_values = dict()
 
-	# defining direction implications
-	correct_direction = MutableFuzzySet(direction_domain)
-	correct_direction.set_value_at(0, 0)
-	correct_direction.set_value_at(1, 1)
 
-	# defining distance implications
-	dangerously_close = CalculatedFuzzySet(distance_domain)
-	dangerously_close.set_calculated_memberships("l", alpha=0.1, beta=0.2)
-	close = CalculatedFuzzySet(distance_domain)
-	close.set_calculated_memberships("l", alpha=0.1, beta=0.35)
-	not_close = zadeh_not(close)
-	not_dangerously_close = zadeh_not(dangerously_close)
+class RuddRuleBase(object):
+	def __init__(self):
+		self.instant_values = dict()
 
-	# defining angle implications
-	# pozitivni kutevi uzrokuju skretanje ulijevo
-	# negativni kutevi uzrokuju skretanje udesno
-	sharp_right = CalculatedFuzzySet(angle_domain)
-	sharp_right.set_calculated_memberships("l", alpha=0.2, beta=0.4)
-	sharp_left = CalculatedFuzzySet(angle_domain)
-	sharp_left.set_calculated_memberships("gamma", alpha=0.6, beta=0.8)
+		# RULES
+		self.rule_sharp_right = Rule(angle_domain, L=dangerously_close, D=not_close,
+									 LK=zadeh_or(dangerously_close, close),
+									 DK=not_close, S=correct_direction, V=small_velocity, K_rule=sharp_right)
 
-	# defining velocity implications
-	small_velocity = CalculatedFuzzySet(velocity_domain)
-	small_velocity.set_calculated_memberships("l", alpha=0.2, beta=0.3)
-	large_velocity = CalculatedFuzzySet(velocity_domain)
-	large_velocity.set_calculated_memberships("gamma", alpha=0.68, beta=0.7)
+		self.rule_sharp_left = Rule(angle_domain, L=dangerously_close, D=not_close,
+									LK=zadeh_or(dangerously_close, close),
+									DK=not_close, S=correct_direction, V=small_velocity, K_rule=sharp_right)
 
-	# defining acceleration implications
-	large_acceleration = CalculatedFuzzySet(acceleration_domain)
-	large_acceleration.set_calculated_memberships("gamma", alpha=0.68, beta=0.7)
+	def update_input_values_for_rules(self):
+		"""
+		Updating input values in each rule.
+		"""
+		self.rule_sharp_right.instant_values = self.instant_values
+		self.rule_sharp_left.instant_values = self.instant_values
 
-	# print(defuzzyfication(sharp_left))
-	# print(defuzzyfication(sharp_right))
-	# print(defuzzyfication(dangerously_close))
-	# print(defuzzyfication(close))
-
-	# plot_fuzzy_set(close)
-	my_rule = Rule(acceleration_domain, L=close, D=not_close, LK=not_close, DK=not_close, V=small_velocity,
-				   S=correct_direction, Arule=large_acceleration)
-	my_rule.instant_values = dict(L=100, D=100, LK=100, DK=100, V=25, S=1)
-	# print(my_rule.instant_values)
-	my_rule.calculate_fuzzy_rule()
+	def calculate_rule_union(self):
+		"""
+		Calculating final fuzzy set that will be result of all rules combined together.
+		:return: FuzzySet
+		"""
+		result = zadeh_or(self.rule_sharp_left, self.rule_sharp_right)
+		return result

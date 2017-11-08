@@ -17,6 +17,7 @@ def zadeh_not(fuzzy_set):
 	fuzzy_not.set_name = "ZadehNot_{}".format(fuzzy_set.set_name)
 	return fuzzy_not
 
+
 def zadeh_or(fuzzy_set1, fuzzy_set2):
 	"""
 	Implementation of Zadehs or function.
