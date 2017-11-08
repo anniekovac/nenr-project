@@ -1,6 +1,7 @@
 from matplotlib import pyplot
 from sets import MutableFuzzySet, CalculatedFuzzySet
 from domain import SimpleDomain, CompositeDomain
+from operations import zadeh_not
 
 
 def plot_fuzzy_set(fuzzy_set, y_axis_title="Membership function", x_axis_title="Domain"):
@@ -72,6 +73,8 @@ if __name__ == "__main__":
 	dangerously_close.set_calculated_memberships("l", alpha=0.1, beta=0.2)
 	close = CalculatedFuzzySet(distance_domain)
 	close.set_calculated_memberships("l", alpha=0.1, beta=0.35)
+	not_close = zadeh_not(close)
+	not_dangerously_close = zadeh_not(dangerously_close)
 
 	# defining angle implications
 	# pozitivni kutevi uzrokuju skretanje ulijevo
@@ -81,12 +84,18 @@ if __name__ == "__main__":
 	sharp_left = CalculatedFuzzySet(angle_domain)
 	sharp_left.set_calculated_memberships("gamma", alpha=0.6, beta=0.8)
 
+	# defining velocity implications
+	small_velocity = CalculatedFuzzySet(velocity_domain)
+	small_velocity.set_calculated_memberships("l", alpha=0.2, beta=0.3)
+	large_velocity = CalculatedFuzzySet(velocity_domain)
+	large_velocity.set_calculated_memberships("gamma", alpha=0.68, beta=0.7)
+
 	print(defuzzyfication(sharp_left))
 	print(defuzzyfication(sharp_right))
 	print(defuzzyfication(dangerously_close))
 	print(defuzzyfication(close))
 
-	plot_fuzzy_set(close)
+	plot_fuzzy_set(large_velocity)
 
 
 
