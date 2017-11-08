@@ -44,29 +44,55 @@ def defuzzyfication(fuzzy_set):
 	:return: int
 	"""
 	membership_sum = sum(fuzzy_set.memberships)
-	numerator = sum([value*domain_element for (value, domain_element) in zip(fuzzy_set.memberships, fuzzy_set.domain.domain_elements)])
-	return numerator/membership_sum
+	numerator = sum([value * domain_element for (value, domain_element) in
+					 zip(fuzzy_set.memberships, fuzzy_set.domain.domain_elements)])
+	return numerator / membership_sum
 
 
 class Rule(CalculatedFuzzySet):
 	"""
 	Domena se definira izvan pravila, te se zatim zove pravilo.
 	"""
+
 	def __init__(self, domain, **kwargs):
 		"""
 		:param domain: Domain class instance 
 		:param kwargs: FuzzySets (for example "L", "DK" etc)
 		"""
 		CalculatedFuzzySet.__init__(self, domain)
+		self.instant_values = dict()
+		self.fuzzy_sets = kwargs
+
+	def calculate_fuzzy_rule(self):
+		minimum = 1
+		for key, value in self.instant_values.items():
+			fuzzy_set = self.fuzzy_sets[key]
+			if fuzzy_set.member_dict[value] < minimum:
+				minimum = fuzzy_set.member_dict[value]
+
+		key = [value for (item, value) in self.fuzzy_sets.items() if "rule" in item]
+		if len(key) != 1:
+			raise ValueError
+		fuzzy_rule = key[0]
+
+		for (idx, item) in enumerate(fuzzy_rule.memberships):
+			if item > minimum:
+				fuzzy_rule.memberships[idx] = minimum
+		fuzzy_rule.update_member_dict()
 
 
 if __name__ == "__main__":
-
+	# defining domains
 	angle_domain = SimpleDomain(-90, 91)
 	distance_domain = SimpleDomain(0, 701)  # it is enough for distance domain to have 700 pixels
 	velocity_domain = SimpleDomain(20, 51)
 	direction_domain = SimpleDomain(0, 2)
-	acceleration_domain = SimpleDomain(0, 11)
+	acceleration_domain = SimpleDomain(-10, 11)
+
+	# defining direction implications
+	correct_direction = MutableFuzzySet(direction_domain)
+	correct_direction.set_value_at(0, 0)
+	correct_direction.set_value_at(1, 1)
 
 	# defining distance implications
 	dangerously_close = CalculatedFuzzySet(distance_domain)
@@ -90,12 +116,18 @@ if __name__ == "__main__":
 	large_velocity = CalculatedFuzzySet(velocity_domain)
 	large_velocity.set_calculated_memberships("gamma", alpha=0.68, beta=0.7)
 
-	print(defuzzyfication(sharp_left))
-	print(defuzzyfication(sharp_right))
-	print(defuzzyfication(dangerously_close))
-	print(defuzzyfication(close))
+	# defining acceleration implications
+	large_acceleration = CalculatedFuzzySet(acceleration_domain)
+	large_acceleration.set_calculated_memberships("gamma", alpha=0.68, beta=0.7)
 
-	plot_fuzzy_set(large_velocity)
+	# print(defuzzyfication(sharp_left))
+	# print(defuzzyfication(sharp_right))
+	# print(defuzzyfication(dangerously_close))
+	# print(defuzzyfication(close))
 
-
-
+	# plot_fuzzy_set(close)
+	my_rule = Rule(acceleration_domain, L=close, D=not_close, LK=not_close, DK=not_close, V=small_velocity,
+				   S=correct_direction, Arule=large_acceleration)
+	my_rule.instant_values = dict(L=100, D=100, LK=100, DK=100, V=25, S=1)
+	# print(my_rule.instant_values)
+	my_rule.calculate_fuzzy_rule()
