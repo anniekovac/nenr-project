@@ -19,16 +19,6 @@ def fuzzy_magic(nums_from_input):
 	fuzzy_setV = fuzzyfication(V, 20, 51)
 	#plot_fuzzy_set(fuzzy_setL)
 
-	angle_domain = SimpleDomain(-90, 91)
-	distance_domain = SimpleDomain(0, 1301)
-	dangerously_close = CalculatedFuzzySet(distance_domain, "l")
-	dangerously_close.set_calculated_memberships("l", alpha=0.1, beta=0.7)
-	close = CalculatedFuzzySet(distance_domain, "l")
-	close.set_calculated_memberships("l", alpha=0.4, beta=0.7)
-	#plot_fuzzy_set(close)
-	my_rule = Rule(angle_domain, L=fuzzy_setL, LK=fuzzy_setLK)
-
-
 if __name__ == "__main__":
 
 	while True:
@@ -39,9 +29,6 @@ if __name__ == "__main__":
 			break
 		nums_from_input = [int(s) for s in my_input.split(" ") if s.isdigit()]
 		fuzzy_magic(nums_from_input)
-
-
-
 
 		# L - udaljenost broda od obale prema lijevo
 		# D - udaljenost broda od obale prema desno

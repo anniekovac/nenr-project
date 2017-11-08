@@ -57,27 +57,36 @@ class Rule(CalculatedFuzzySet):
 		:param kwargs: FuzzySets (for example "L", "DK" etc)
 		"""
 		CalculatedFuzzySet.__init__(self, domain)
-		#import pdb; pdb.set_trace()
-
-
 
 
 if __name__ == "__main__":
 
 	angle_domain = SimpleDomain(-90, 91)
-	distance_domain = SimpleDomain(0, 1301)
-	dangerously_close = CalculatedFuzzySet(distance_domain)
-	dangerously_close.set_calculated_memberships("l", alpha=0.1, beta=0.7)
-	close = CalculatedFuzzySet(distance_domain, "l")
-	close.set_calculated_memberships("l", alpha=0.4, beta=0.7)
+	distance_domain = SimpleDomain(0, 701)  # it is enough for distance domain to have 700 pixels
+	velocity_domain = SimpleDomain(20, 51)
+	direction_domain = SimpleDomain(0, 2)
+	acceleration_domain = SimpleDomain(0, 11)
 
+	# defining distance implications
+	dangerously_close = CalculatedFuzzySet(distance_domain)
+	dangerously_close.set_calculated_memberships("l", alpha=0.1, beta=0.2)
+	close = CalculatedFuzzySet(distance_domain)
+	close.set_calculated_memberships("l", alpha=0.1, beta=0.35)
+
+	# defining angle implications
 	# pozitivni kutevi uzrokuju skretanje ulijevo
 	# negativni kutevi uzrokuju skretanje udesno
 	sharp_right = CalculatedFuzzySet(angle_domain)
 	sharp_right.set_calculated_memberships("l", alpha=0.2, beta=0.4)
 	sharp_left = CalculatedFuzzySet(angle_domain)
 	sharp_left.set_calculated_memberships("gamma", alpha=0.6, beta=0.8)
-	plot_fuzzy_set(sharp_left)
+
+	print(defuzzyfication(sharp_left))
+	print(defuzzyfication(sharp_right))
+	print(defuzzyfication(dangerously_close))
+	print(defuzzyfication(close))
+
+	plot_fuzzy_set(close)
 
 
 
