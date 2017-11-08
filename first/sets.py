@@ -205,6 +205,9 @@ class CalculatedFuzzySet(FuzzySet):
 		self.memberships = [0] * len(self.domain.domain_elements)
 		self.set_name = set_name
 
+	def update_member_dict(self):
+		self.member_dict = dict([(domain_element, value) for (domain_element, value) in zip(self.domain.domain_elements, self.memberships)])
+
 	def set_calculated_memberships(self, my_func, **kwargs):
 		"""
 		Function for setting membership values to CalculatedFuzzySet.
