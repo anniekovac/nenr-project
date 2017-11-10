@@ -140,7 +140,7 @@ def _lambda_function(domain, **kwargs):
 		if index >= beta and index < gamma:
 			value = (gamma - index) / (gamma - beta)
 		if index >= gamma:
-			value = 1.0
+			value = 0.0
 		output_list[index] = value
 
 	return output_list
