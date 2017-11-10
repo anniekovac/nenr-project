@@ -51,6 +51,9 @@ class MutableFuzzySet(FuzzySet):
 		self.set_name = set_name
 		self.member_dict = dict([(item, 0) for item in self.domain.domain_elements])
 
+	def update_member_dict(self):
+		self.member_dict = dict([(domain_element, value) for (domain_element, value) in zip(self.domain.domain_elements, self.memberships)])
+
 	def set_value_at(self, domain_element, element_value):
 		"""
 		This method allows you to set element_value to
