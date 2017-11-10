@@ -59,6 +59,15 @@ for (idx, element) in enumerate(universal_distance.domain.domain_elements):
 universal_distance.update_member_dict()
 
 
+universal_distance_with_a_twist = MutableFuzzySet(distance_domain)
+for (idx, element) in enumerate(universal_distance_with_a_twist.domain.domain_elements):
+	if element == 23:
+		universal_distance_with_a_twist.memberships[idx] = 0.5
+	else:
+		universal_distance_with_a_twist.memberships[idx] = 1
+universal_distance_with_a_twist.update_member_dict()
+
+
 acceleration_rule = MutableFuzzySet(distance_domain)
 for (idx, element) in enumerate(acceleration_rule.domain.domain_elements):
 	if element == 0:
@@ -69,4 +78,8 @@ for (idx, element) in enumerate(acceleration_rule.domain.domain_elements):
 		acceleration_rule.memberships[idx] = 0
 acceleration_rule.update_member_dict()
 
+
+my_acc_set = CalculatedFuzzySet(distance_domain)
+my_acc_set.set_calculated_memberships("lambda", alpha=0.3, beta=0.5, gamma=0.7)
+my_acc_set.update_member_dict()
 
