@@ -21,21 +21,6 @@ def plot_fuzzy_set(fuzzy_set, y_axis_title="Membership function", x_axis_title="
 	pyplot.show()
 
 
-def fuzzyfication(singleton, first, last):
-	"""
-	This function is used for fuzzyfication of singleton value.
-	It creates fuzzy set out of singleton value.
-	:param singleton: int (single value of input variable) 
-	:param first: int (first element of domain)
-	:param last: int (last element of domain - not included in the domain) 
-	:return: FuzzySet
-	"""
-	my_fuzzy_domain = SimpleDomain(first, last)
-	my_fuzzy_set = MutableFuzzySet(my_fuzzy_domain, set_name="Input fuzzificated set")
-	my_fuzzy_set.set_value_at(singleton, 1)
-	return my_fuzzy_set
-
-
 def defuzzyfication(fuzzy_set):
 	"""
 	Function used for defuzzyfication of a fuzzy set. This means that
@@ -47,7 +32,11 @@ def defuzzyfication(fuzzy_set):
 	membership_sum = sum(fuzzy_set.memberships)
 	numerator = sum([value * domain_element for (value, domain_element) in
 					 zip(fuzzy_set.memberships, fuzzy_set.domain.domain_elements)])
-	return numerator / membership_sum
+	# return numerator / membership_sum
+	if membership_sum == 0:
+		return 0
+	else:
+		return numerator / membership_sum
 
 
 class Rule(CalculatedFuzzySet):
@@ -61,26 +50,52 @@ class Rule(CalculatedFuzzySet):
 		self.fuzzy_sets = kwargs
 
 	def calculate_fuzzy_rule(self):
+		# first, finding minimum value with which some
+		# input value belongs to its set
 		minimum = 1
 		for key, value in self.instant_values.items():
 			fuzzy_set = self.fuzzy_sets[key]
 			if fuzzy_set.member_dict[value] < minimum:
 				minimum = fuzzy_set.member_dict[value]
 
+		# searching for the set that is result of this implication
 		key = [value for (item, value) in self.fuzzy_sets.items() if "rule" in item]
 		if len(key) != 1:
 			raise ValueError
+		# this is my result, if minimum == 1
 		fuzzy_rule = key[0]
+		if minimum == 1:
+			return fuzzy_rule
 
+		# if my minimum is smaller than 1,
+		# we need to "cut" the existing rule on the place where the minimum is placed
 		for (idx, item) in enumerate(fuzzy_rule.memberships):
 			if item > minimum:
 				fuzzy_rule.memberships[idx] = minimum
 		fuzzy_rule.update_member_dict()
+		return fuzzy_rule
 
 
 class AccRuleBase(object):
 	def __init__(self):
 		self.instant_values = dict()
+
+		self.rule_acc = Rule(acceleration_domain, L=universal_distance, D=universal_distance,
+							 LK=universal_distance, DK=universal_distance, S=correct_direction, V=universal_velocity, A_rule=acceleration_rule)
+
+	def update_input_values_for_rules(self):
+		"""
+		Updating input values in each rule.
+		"""
+		self.rule_acc.instant_values = self.instant_values
+
+	def calculate_rule_union(self):
+		"""
+		Calculating final fuzzy set that will be result of all rules combined together.
+		:return: FuzzySet
+		"""
+		result = self.rule_acc.calculate_fuzzy_rule
+		return result
 
 
 class RuddRuleBase(object):
@@ -88,13 +103,20 @@ class RuddRuleBase(object):
 		self.instant_values = dict()
 
 		# RULES
-		self.rule_sharp_right = Rule(angle_domain, L=dangerously_close, D=not_close,
-									 LK=zadeh_or(dangerously_close, close),
-									 DK=not_close, S=correct_direction, V=small_velocity, K_rule=sharp_right)
+		self.rule_sharp_right = Rule(angle_domain, L=dangerously_close, D=universal_distance,
+									 LK=close,
+									 DK=universal_distance, S=correct_direction, V=universal_velocity, K_rule=sharp_right)
 
-		self.rule_sharp_left = Rule(angle_domain, L=dangerously_close, D=not_close,
-									LK=zadeh_or(dangerously_close, close),
-									DK=not_close, S=correct_direction, V=small_velocity, K_rule=sharp_right)
+		self.rule_sharp_left = Rule(angle_domain, L=universal_distance, D=dangerously_close,
+									LK=universal_distance,
+									DK=close, S=correct_direction, V=universal_velocity, K_rule=sharp_left)
+
+		self.rule_keep_direction = Rule(angle_domain, L=not_close, D=not_close, LK=not_close, DK=not_close, S=correct_direction,
+										V=universal_velocity, K_rule=keep_direction)
+
+		# self.rule_keep_direction2 = Rule(angle_domain, L=dangerously_close, D=dangerously_close, LK=universal_distance,
+		# 								DK=universal_distance, S=correct_direction,
+		# 								V=universal_velocity, K_rule=keep_direction)
 
 	def update_input_values_for_rules(self):
 		"""
@@ -108,5 +130,12 @@ class RuddRuleBase(object):
 		Calculating final fuzzy set that will be result of all rules combined together.
 		:return: FuzzySet
 		"""
-		result = zadeh_or(self.rule_sharp_left, self.rule_sharp_right)
+		#plot_fuzzy_set(dangerously_close)
+		#plot_fuzzy_set(close)
+		result = zadeh_or(self.rule_sharp_left.calculate_fuzzy_rule, self.rule_sharp_right.calculate_fuzzy_rule)
+		#import pdb; pdb.set_trace()
+		#result = zadeh_or(result, self.rule_keep_direction.calculate_fuzzy_rule())
+		#result = zadeh_or(result, self.rule_keep_direction2.calculate_fuzzy_rule())
 		return result
+
+
