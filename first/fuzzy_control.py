@@ -13,11 +13,13 @@ def plot_fuzzy_set(fuzzy_set, y_axis_title="Membership function", x_axis_title="
 	:param x_axis_title: str (if you want some other title for your X axis)
 	:return: None
 	"""
+	defuzzyficated = int(defuzzyfication(fuzzy_set))
 	yPoints = fuzzy_set.memberships
 	xPoints = fuzzy_set.domain.domain_elements
 	pyplot.stem(xPoints, yPoints)
 	pyplot.xlabel(x_axis_title, fontsize=16)
 	pyplot.ylabel(y_axis_title, fontsize=16)
+	pyplot.title("Defuzzyficirana vrijednost skupa: {}".format(defuzzyficated))
 	pyplot.show()
 
 
@@ -66,13 +68,14 @@ class Rule(CalculatedFuzzySet):
 		fuzzy_rule = key[0]
 		if minimum == 1:
 			return fuzzy_rule
-
+		#plot_fuzzy_set(fuzzy_rule)
 		# if my minimum is smaller than 1,
 		# we need to "cut" the existing rule on the place where the minimum is placed
 		for (idx, item) in enumerate(fuzzy_rule.memberships):
 			if item > minimum:
 				fuzzy_rule.memberships[idx] = minimum
 		fuzzy_rule.update_member_dict()
+		#plot_fuzzy_set(fuzzy_rule)
 		return fuzzy_rule
 
 
@@ -80,8 +83,8 @@ class AccRuleBase(object):
 	def __init__(self):
 		self.instant_values = dict()
 
-		self.rule_acc = Rule(acceleration_domain, L=universal_distance, D=universal_distance,
-							 LK=universal_distance, DK=universal_distance, S=correct_direction, V=universal_velocity, A_rule=acceleration_rule)
+		self.rule_acc = Rule(acceleration_domain, L=universal_distance_with_a_twist, D=universal_distance,
+							 LK=universal_distance, DK=universal_distance, S=correct_direction, V=universal_velocity, A_rule=my_acc_set)
 
 	def update_input_values_for_rules(self):
 		"""
@@ -94,7 +97,8 @@ class AccRuleBase(object):
 		Calculating final fuzzy set that will be result of all rules combined together.
 		:return: FuzzySet
 		"""
-		result = self.rule_acc.calculate_fuzzy_rule
+		result = self.rule_acc.calculate_fuzzy_rule()
+		#plot_fuzzy_set(result)
 		return result
 
 
@@ -104,12 +108,12 @@ class RuddRuleBase(object):
 
 		# RULES
 		self.rule_sharp_right = Rule(angle_domain, L=dangerously_close, D=universal_distance,
-									 LK=close,
+									 LK=dangerously_close,
 									 DK=universal_distance, S=correct_direction, V=universal_velocity, K_rule=sharp_right)
 
 		self.rule_sharp_left = Rule(angle_domain, L=universal_distance, D=dangerously_close,
 									LK=universal_distance,
-									DK=close, S=correct_direction, V=universal_velocity, K_rule=sharp_left)
+									DK=dangerously_close, S=correct_direction, V=universal_velocity, K_rule=sharp_left)
 
 		self.rule_keep_direction = Rule(angle_domain, L=not_close, D=not_close, LK=not_close, DK=not_close, S=correct_direction,
 										V=universal_velocity, K_rule=keep_direction)
@@ -130,12 +134,6 @@ class RuddRuleBase(object):
 		Calculating final fuzzy set that will be result of all rules combined together.
 		:return: FuzzySet
 		"""
-		#plot_fuzzy_set(dangerously_close)
-		#plot_fuzzy_set(close)
-		result = zadeh_or(self.rule_sharp_left.calculate_fuzzy_rule, self.rule_sharp_right.calculate_fuzzy_rule)
-		#import pdb; pdb.set_trace()
-		#result = zadeh_or(result, self.rule_keep_direction.calculate_fuzzy_rule())
-		#result = zadeh_or(result, self.rule_keep_direction2.calculate_fuzzy_rule())
+		result = zadeh_or(self.rule_sharp_left.calculate_fuzzy_rule(), self.rule_sharp_right.calculate_fuzzy_rule())
+		#plot_fuzzy_set(result)
 		return result
-
-
