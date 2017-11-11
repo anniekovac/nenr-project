@@ -1,3 +1,4 @@
+import copy
 from matplotlib import pyplot
 from sets import MutableFuzzySet, CalculatedFuzzySet
 from domain import SimpleDomain
@@ -31,6 +32,7 @@ def defuzzyfication(fuzzy_set):
 	:param fuzzy_set: FuzzySet class instance 
 	:return: int
 	"""
+	# fuzzy_set.print_fuzzy_set()
 	membership_sum = sum(fuzzy_set.memberships)
 	numerator = sum([value * domain_element for (value, domain_element) in
 					 zip(fuzzy_set.memberships, fuzzy_set.domain.domain_elements)])
@@ -68,14 +70,15 @@ class Rule(CalculatedFuzzySet):
 		fuzzy_rule = key[0]
 		if minimum == 1:
 			return fuzzy_rule
-		#plot_fuzzy_set(fuzzy_rule)
+		else:
+			fuzzy_rule = copy.deepcopy(fuzzy_rule)
+
 		# if my minimum is smaller than 1,
 		# we need to "cut" the existing rule on the place where the minimum is placed
 		for (idx, item) in enumerate(fuzzy_rule.memberships):
 			if item > minimum:
 				fuzzy_rule.memberships[idx] = minimum
 		fuzzy_rule.update_member_dict()
-		#plot_fuzzy_set(fuzzy_rule)
 		return fuzzy_rule
 
 
@@ -109,7 +112,8 @@ class RuddRuleBase(object):
 		# RULES
 		self.rule_sharp_right = Rule(angle_domain, L=dangerously_close, D=universal_distance,
 									 LK=dangerously_close,
-									 DK=universal_distance, S=correct_direction, V=universal_velocity, K_rule=sharp_right)
+									 DK=universal_distance, S=correct_direction, V=universal_velocity,
+									 K_rule=sharp_right)
 
 		self.rule_sharp_left = Rule(angle_domain, L=universal_distance, D=dangerously_close,
 									LK=universal_distance,
