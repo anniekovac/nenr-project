@@ -202,7 +202,6 @@ class CalculatedFuzzySet(FuzzySet):
 
 	def __init__(self, domain, set_name=""):
 		self.domain = domain
-		#self.my_func = my_func
 		self.member_dict = dict([(item, 0) for item in self.domain.domain_elements])
 		self.unitary_function = unitary_function
 		self.memberships = [0] * len(self.domain.domain_elements)

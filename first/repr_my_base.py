@@ -10,6 +10,8 @@ if __name__ == "__main__":
 		my_base = RuddRuleBase()
 	elif my_input == "acc":
 		my_base = AccRuleBase()
+	else:
+		raise ValueError("None of the above is selected!")
 
 	my_input = input("Enter L, D, LK, DK, V, S:\n")
 	nums_from_input = [int(s) for s in my_input.split(" ") if s.isdigit()]

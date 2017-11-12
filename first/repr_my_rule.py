@@ -1,4 +1,4 @@
-from fuzzy_control import RuddRuleBase, AccRuleBase, plot_fuzzy_set
+from fuzzy_control import RuddRuleBase, AccRuleBase, plot_fuzzy_set, defuzzyfication
 from fuzzy_inputs import *
 
 if __name__ == "__main__":
@@ -25,4 +25,6 @@ if __name__ == "__main__":
 	#import pdb; pdb.set_trace()
 	#plot_fuzzy_set(my_rule)
 	result = my_rule.calculate_fuzzy_rule()
+
 	plot_fuzzy_set(result)
+	print(defuzzyfication(result))

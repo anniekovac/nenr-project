@@ -86,21 +86,21 @@ class AccRuleBase(object):
 	def __init__(self):
 		self.instant_values = dict()
 
-		self.rule_acc = Rule(acceleration_domain, L=universal_distance_with_a_twist, D=universal_distance,
-							 LK=universal_distance, DK=universal_distance, S=correct_direction, V=universal_velocity, A_rule=my_acc_set)
+		self.rule_speed_up = Rule(acceleration_domain, L=universal_distance, D=universal_distance,
+							 LK=universal_distance, DK=universal_distance, S=correct_direction, V=small_velocity, A_rule=large_acceleration)
 
 	def update_input_values_for_rules(self):
 		"""
 		Updating input values in each rule.
 		"""
-		self.rule_acc.instant_values = self.instant_values
+		self.rule_speed_up.instant_values = self.instant_values
 
 	def calculate_rule_union(self):
 		"""
 		Calculating final fuzzy set that will be result of all rules combined together.
 		:return: FuzzySet
 		"""
-		result = self.rule_acc.calculate_fuzzy_rule()
+		result = self.rule_speed_up.calculate_fuzzy_rule()
 		#plot_fuzzy_set(result)
 		return result
 

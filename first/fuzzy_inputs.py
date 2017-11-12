@@ -2,7 +2,7 @@ from domain import SimpleDomain
 from sets import MutableFuzzySet, CalculatedFuzzySet
 from operations import zadeh_not
 
-distance_domain = SimpleDomain(0, 1301)  # it is enough for distance domain to have 700 pixels
+distance_domain = SimpleDomain(0, 1301)
 velocity_domain = SimpleDomain(20, 51)
 direction_domain = SimpleDomain(0, 2)
 acceleration_domain = SimpleDomain(-10, 11)
@@ -13,7 +13,7 @@ correct_direction.set_value_at(0, 0)
 correct_direction.set_value_at(1, 1)
 
 dangerously_close = CalculatedFuzzySet(distance_domain)
-dangerously_close.set_calculated_memberships("l", alpha=0.02, beta=0.08)
+dangerously_close.set_calculated_memberships("l", alpha=0.02, beta=0.05)
 
 close = CalculatedFuzzySet(distance_domain)
 close.set_calculated_memberships("l", alpha=0.05, beta=0.07)
@@ -25,7 +25,7 @@ not_close = zadeh_not(close)
 not_dangerously_close = zadeh_not(dangerously_close)
 
 small_velocity = CalculatedFuzzySet(velocity_domain)
-small_velocity.set_calculated_memberships("l", alpha=0.2, beta=0.3)
+small_velocity.set_calculated_memberships("l", alpha=0.2, beta=0.84)
 
 large_velocity = CalculatedFuzzySet(velocity_domain)
 large_velocity.set_calculated_memberships("gamma", alpha=0.68, beta=0.7)
@@ -68,7 +68,7 @@ for (idx, element) in enumerate(universal_distance_with_a_twist.domain.domain_el
 universal_distance_with_a_twist.update_member_dict()
 
 
-acceleration_rule = MutableFuzzySet(distance_domain)
+acceleration_rule = MutableFuzzySet(acceleration_domain)
 for (idx, element) in enumerate(acceleration_rule.domain.domain_elements):
 	if element == 0:
 		acceleration_rule.memberships[idx] = 0
@@ -82,4 +82,5 @@ acceleration_rule.update_member_dict()
 my_acc_set = CalculatedFuzzySet(distance_domain)
 my_acc_set.set_calculated_memberships("lambda", alpha=0.3, beta=0.5, gamma=0.7)
 my_acc_set.update_member_dict()
+
 
