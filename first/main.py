@@ -4,14 +4,19 @@ from fuzzy_inputs import *
 
 if __name__ == "__main__":
 
+	# initializing both RuleBases for
+	# controlling Rudder and Acceleration
+	# of the boat
 	rudd = RuddRuleBase()
 	acc = AccRuleBase()
 
+	# creating txt used for easier testing of the program
 	with open("original_input.txt", "w") as f:
 		f.write("\nBeginning")
 
 	while True:
 
+		# creating input dictionary from inputs
 		my_input = input()
 		if "KRAJ" in my_input:
 			break
@@ -34,6 +39,8 @@ if __name__ == "__main__":
 		print("{} {}".format(int(A), int(K)))
 		sys.stdout.flush();
 
+		# writing input variables and output control variables
+		# to previously defined txt for easier debugging and testing
 		my_val_string = str(nums_from_input).replace(",", "")
 		with open("original_input.txt", "a") as f:
 			f.write("\n{}, A={}, K={}".format(my_val_string, int(A), int(K)))
