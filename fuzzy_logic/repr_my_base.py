@@ -30,4 +30,3 @@ if __name__ == "__main__":
 	my_base.update_input_values_for_rules()
 	fuzzy_result = my_base.calculate_rule_union()
 	plot_fuzzy_set(fuzzy_result)
-
