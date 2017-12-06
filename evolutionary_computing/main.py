@@ -4,10 +4,13 @@ import random
 import matplotlib.pyplot as plt
 import copy
 
+
 class Guess(object):
 	def __init__(self, gene):
 		"""
 		:param genes: list 
+		:param fitness: float
+		:param MSE: float
 		"""
 		self.gene = gene
 		self.fitness = None
@@ -16,18 +19,21 @@ class Guess(object):
 
 def my_function(gene, x, y):
 	"""
+	Function defined by the assignment.
 	:param gene: numpy array 
 	:param x: float
 	:param y: float
 	:return: function output
 	"""
 	b0, b1, b2, b3, b4 = gene
-	return numpy.sin(b0 + b1*x)+b2*numpy.cos(x*(b3+y))*(1/(1+numpy.exp((numpy.square(x-b4)))))
+	return numpy.sin(b0 + b1 * x) + b2 * numpy.cos(x * (b3 + y)) * (1 / (1 + numpy.exp((numpy.square(x - b4)))))
 
 
 def parse_data(path_to_file):
 	"""
-	:param path_to_file: str (path to data) 
+	Function for parsing data from dataset files.
+	:param path_to_file: str (path to data)
+	:return numpy.array : array of inputs, and their output [[x1, y1, z1], [x2, y2, z2]...]
 	"""
 	final = numpy.array([0, 0, 0])
 	with open(path_to_file, 'r') as data:
@@ -45,7 +51,7 @@ def parse_data(path_to_file):
 def get_fitness(guess):
 	"""
 	:param guess: Guess instance
-	:return: float (MQE - mean quadratic error)
+	:return: float, float (fitness, MSE)
 	"""
 	dataset1 = os.path.join(os.path.dirname(__file__), "zad4-dataset1.txt")
 	dataset2 = os.path.join(os.path.dirname(__file__), "zad4-dataset2.txt")
@@ -57,13 +63,20 @@ def get_fitness(guess):
 		x = row[0]
 		y = row[1]
 		f_system = my_function(guess.gene, x, y)
-		sum_of_diffs += numpy.square(f_system-f_real)
+		sum_of_diffs += numpy.square(f_system - f_real)
 		number_of_samples += 1
-	MSE = sum_of_diffs/number_of_samples
-	fitness = 1/MSE
+	MSE = sum_of_diffs / number_of_samples
+	fitness = 1 / MSE
 	return (fitness, MSE)
 
+
 def mutation(guess, mutation_probability=0.01):
+	"""
+	Mutation of one guess.
+	:param guess: Guess instance
+	:param mutation_probability: float (probability for a mutation to happen) 
+	:return: Guess instance (new mutated guess)
+	"""
 	gene = guess.gene
 	for index, num in enumerate(gene):
 		if numpy.random.uniform(low=0, high=1) <= mutation_probability:
@@ -104,14 +117,64 @@ def generate_population(n):
 		guess_instance.fitness = fitness
 		guess_instance.MSE = MSE
 		population.append(guess_instance)
-		#print(fitness)
 	return population
 
 
-def kanonski_generacijski(n):
-	first_population = generate_population(n)
+def roulette_wheel(population):
+	"""
+	Implemented roulette wheel selection.
+	:param population: list of Guess instances
+	:return: Guess instance
+	"""
+	choices = {chromosome: chromosome.fitness for chromosome in population}
+	max = sum(choices.values())
+	pick = random.uniform(0, max)
+	current = 0
+	for key, value in choices.items():
+		current += value
+		if current > pick:
+			return key
+
+
+def kanonski_generacijski(n, iterations, mut_prob, mse_exit_criteria=0.01, elitism=True):
+	population = generate_population(n)
+	i = iterations
+	while i:
+		i -= 1
+		new_population = []
+		if elitism:
+			min_MSE = min([item.MSE for item in population])
+			new_population.append([guess for guess in population if guess.MSE == min_MSE][0])
+		while len(new_population) < n:
+			first_parent = roulette_wheel(population)
+			second_parent = roulette_wheel(population)
+			child = crossover(first_parent, second_parent, mut_prob)
+			fitness, MSE = get_fitness(child)
+			child.fitness = fitness
+			child.MSE = MSE
+			new_population.append(child)
+		population = new_population
+		min_MSE = min([item.MSE for item in population])
+		best_of = [item for item in population if item.MSE == min_MSE][0]
+		if min_MSE < mse_exit_criteria:
+			break
+		print("iteration: {}, minimal MSE: {}".format(iterations - i, min_MSE))
+	return best_of
+
 
 def tri_turnirska_eliminacijska(n, iterations, mut_prob, mse_exit_criteria=0.01):
+	"""
+	Implemented k-tournir elimination selection. In this case k = 3.
+	Three guesses are chosen and two better ones are selected to be 
+	the parents of a new guess. This guess is result of crossover from its
+	two parents. The third one (third guess) is eliminated and replaced by child
+	of the other two.
+	:param n: int (number of guesses in population)
+	:param iterations: int (number of iterations)
+	:param mut_prob: float (probability of mutation)
+	:param mse_exit_criteria: float (how low MSE has to be in order to break from a loop)
+	:return: Guess instance (best guess)
+	"""
 	population = generate_population(n)
 	i = iterations
 	while i:
@@ -127,15 +190,19 @@ def tri_turnirska_eliminacijska(n, iterations, mut_prob, mse_exit_criteria=0.01)
 		population = [guess for guess in population if guess != elim_choice]
 		population.append(child)
 		min_MSE = min([item.MSE for item in population])
+		best_of = [item for item in population if item.MSE == min_MSE][0]
 		if min_MSE < mse_exit_criteria:
 			break
-		if i%1000 == 0:
-			print(min_MSE)
-		best_of = [item for item in population if item.MSE == min_MSE][0]
+		if i % 100 == 0:
+			print("iteration: {}, minimal MSE: {}".format(iterations - i, min_MSE))
 	return best_of
+
 
 def plot(final, best):
 	"""
+	Plotting correct outputs of a function (measured in final)
+	against outputs of a function that gives best possible guess calculated
+	by EA.
 	:param final: array of inputs and output (data that we have from dataset) 
 	:param best: best genes found (Guess instance)
 	"""
@@ -143,7 +210,7 @@ def plot(final, best):
 	corr_outputs = []
 	my_outputs = []
 	my_final = copy.deepcopy(final)
-	my_final = my_final[200:]
+	my_final = my_final[150:]
 	for i, item in enumerate(my_final):
 		corr_output = item[2]
 		x, y = item[0], item[1]
@@ -160,15 +227,22 @@ def plot(final, best):
 
 
 def main():
-	n = 25  # POPULATION SIZE
-	mut_prob = 0.01  # MUTATION PROBABILITY
-	number_of_iterations = 25000  # NUMBER OF ITERATIONS
+	n = 15  # POPULATION SIZE
+	mut_prob = 0.1  # MUTATION PROBABILITY
+	number_of_iterations = 2500  # NUMBER OF ITERATIONS
 
 	dataset1 = os.path.join(os.path.dirname(__file__), "zad4-dataset1.txt")
 	final = parse_data(dataset1)
-	# kanonski_generacijski(n)
-	best = tri_turnirska_eliminacijska(n, number_of_iterations, mut_prob, mse_exit_criteria=0.01)
+
+	my_input = input("Enter letters according to your wishes:\nKanonski generacijski = KG\nTro-turnirski eliminacijski = TTE\n")
+	if my_input == "TTE":
+		best = tri_turnirska_eliminacijska(n, number_of_iterations, mut_prob, mse_exit_criteria=0.01)
+	elif my_input == "KG":
+		best = kanonski_generacijski(n, number_of_iterations, mut_prob, mse_exit_criteria=0.002)
+	else:
+		raise ValueError("Incorrect input!")
 	plot(final, best)
+
 
 if __name__ == "__main__":
 	main()
