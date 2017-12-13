@@ -27,8 +27,22 @@ def normalize_points(touch_points):
 	normalized_touch_points = normalized_touch_points / m
 	return normalized_touch_points
 
+
+def calculate_distance(normalized_points):
+	"""
+	:param normalized_points: numpy.array: [[x1, y1], [x2, y2], [x3, y3] ... ] list of lists
+	:return: float (total distance of gesture)
+	"""
+	D = 0
+	for i in range(1, len(normalized_points)):
+		dist = numpy.linalg.norm(normalized_points[i] - normalized_points[i-1])
+		D += dist
+	return D
+
+
 if __name__ == '__main__':
 	touch_points = run_gui()
 	points = run_gui()
 	normalized_points = normalize_points(points)
-	
+	D = calculate_distance(normalized_points)
+	print(D)
