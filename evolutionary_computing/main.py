@@ -158,7 +158,8 @@ def kanonski_generacijski(n, iterations, mut_prob, mse_exit_criteria=0.01, eliti
 		best_of = [item for item in population if item.MSE == min_MSE][0]
 		if min_MSE < mse_exit_criteria:
 			break
-		print("iteration: {}, minimal MSE: {}".format(iterations - i, min_MSE))
+		if i % 100 == 0:
+			print("iteration: {}, minimal MSE: {}".format(iterations - i, min_MSE))
 	return best_of
 
 
@@ -210,7 +211,7 @@ def plot(final, best):
 	corr_outputs = []
 	my_outputs = []
 	my_final = copy.deepcopy(final)
-	my_final = my_final[150:]
+	my_final = my_final[130:]
 	for i, item in enumerate(my_final):
 		corr_output = item[2]
 		x, y = item[0], item[1]
@@ -228,19 +229,20 @@ def plot(final, best):
 
 def main():
 	n = 15  # POPULATION SIZE
-	mut_prob = 0.1  # MUTATION PROBABILITY
-	number_of_iterations = 2500  # NUMBER OF ITERATIONS
+	mut_prob = 0.01  # MUTATION PROBABILITY
+	number_of_iterations = 25000  # NUMBER OF ITERATIONS
 
 	dataset1 = os.path.join(os.path.dirname(__file__), "zad4-dataset1.txt")
 	final = parse_data(dataset1)
 
 	my_input = input("Enter letters according to your wishes:\nKanonski generacijski = KG\nTro-turnirski eliminacijski = TTE\n")
 	if my_input == "TTE":
-		best = tri_turnirska_eliminacijska(n, number_of_iterations, mut_prob, mse_exit_criteria=0.01)
+		best = tri_turnirska_eliminacijska(n, number_of_iterations, mut_prob, mse_exit_criteria=0.001)
 	elif my_input == "KG":
-		best = kanonski_generacijski(n, number_of_iterations, mut_prob, mse_exit_criteria=0.002)
+		best = kanonski_generacijski(n, number_of_iterations, mut_prob, mse_exit_criteria=0.005)
 	else:
 		raise ValueError("Incorrect input!")
+	print("Best guess is: {}".format(best.gene))
 	plot(final, best)
 
 
