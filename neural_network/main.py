@@ -60,7 +60,6 @@ def translate_output(final_inputs, nn):
 
 
 # TODO: implement possibility of multiple outputs in GUI
-# TODO: implement 3 different algorithms of learning
 if __name__ == '__main__':
 	M = 50
 	# net_architecture = input("Enter wanted net architecture:\n")
@@ -76,14 +75,14 @@ if __name__ == '__main__':
 	list_of_lists = create_network_architecture(arch_numbers)
 	samples = get_database_from_txt(os.path.join(os.getcwd(), "greek_letters_database.txt"))
 	nn = train(samples, list_of_lists)
-	radi = True
-	while radi:
-		represent_points = get_user_input(M)
-		final_inputs = []
-		for x, y in represent_points:
-			final_inputs.append(x)
-			final_inputs.append(y)
-		final_inputs = numpy.array(final_inputs)
-		print(translate_output(final_inputs, nn))
-		radi = input("Hoces li jos (True ili False):\n")
-		radi = bool(radi)
+#	radi = True
+#	while radi:
+	represent_points = get_user_input(M)
+	final_inputs = []
+	for x, y in represent_points:
+		final_inputs.append(x)
+		final_inputs.append(y)
+	final_inputs = numpy.array(final_inputs)
+	print(translate_output(final_inputs, nn))
+		# radi = input("Hoces li jos (True ili False):\n")
+		# radi = bool(radi)

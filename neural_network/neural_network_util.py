@@ -2,6 +2,57 @@ import numpy
 from define_classes import InputNeuron, Neuron, sigmoid, derivatives_sigmoid
 
 
+def learning_algortihms(eta, samples, neural_net, choose_algorithm="BP"):
+	"""
+	Implementing three learning algorithms.
+	- backpropagation ("BP") - using entire batch of samples
+	- stohastic backpropagation ("SBP") - learning sample by sample
+	- mini-batch backpropagation ("MBBP")- learning by batches of smaller size (20)
+	
+	:param eta: learning rate
+	:param samples: numpy array (list of Sample class instances)
+	:param neural_net: list of lists (architecture of neural network)
+	:return: 
+	"""
+	if choose_algorithm == "BP":
+		return backpropagation(eta, samples, neural_net)
+	elif choose_algorithm == "SBP":
+		nn = neural_net
+		for sample in samples:
+			nn = backpropagation(eta, sample, nn)
+		return nn
+	elif choose_algorithm == "MBBP":
+		alphas = []
+		betas = []
+		gammas = []
+		deltas = []
+		epsilons = []
+		for sample in samples:
+			outputs = sample.outputs.tolist()
+			if (outputs > [1, 0, 0, 0, 0]) - (outputs < [1, 0, 0, 0, 0]) == 0:
+				alphas.append(sample)
+			elif (outputs > [0, 1, 0, 0, 0]) - (outputs < [0, 1, 0, 0, 0]) == 0:
+				betas.append(sample)
+			elif (outputs > [0, 0, 1, 0, 0]) - (outputs < [0, 0, 1, 0, 0]) == 0:
+				gammas.append(sample)
+			elif (outputs > [0, 0, 0, 1, 0]) - (outputs < [0, 0, 0, 1, 0]) == 0:
+				deltas.append(sample)
+			elif (outputs > [0, 0, 0, 0, 1]) - (outputs < [0, 0, 0, 0, 1]) == 0:
+				epsilons.append(sample)
+
+		nn = neural_net
+		for i in range(0, 10, 2):  # select every other i
+			mini_batch = []
+			mini_batch.extend([alphas[i], alphas[i+1]])
+			mini_batch.extend([betas[i], betas[i + 1]])
+			mini_batch.extend([gammas[i], gammas[i + 1]])
+			mini_batch.extend([deltas[i], deltas[i + 1]])
+			mini_batch.extend([epsilons[i], epsilons[i + 1]])
+			mini_batch = numpy.array(mini_batch)
+			nn = backpropagation(eta, mini_batch, nn)
+		return nn
+
+
 def train(samples, neural_net):
 	"""
 	Function used for training neural network. 
@@ -13,7 +64,8 @@ def train(samples, neural_net):
 	brojac = 10000
 	while brojac:
 		if brojac % 1000 == 0:
-			neural_net = backpropagation(0.1, samples, neural_net)
+			# neural_net = backpropagation(0.1, samples, neural_net)
+			neural_net = learning_algortihms(0.1, samples, neural_net, choose_algorithm="MBBP")
 			MSE = 0
 			for idx, sample in enumerate(samples):
 				input = sample.inputs
@@ -85,6 +137,11 @@ def backpropagation(eta, samples, neural_net):
 			if layer_idx == len(neural_net) - 1:
 				break
 			neural_net[layer_idx][neuron_idx].gradients_from_next_layer = numpy.zeros(len(neural_net[layer_idx + 1]))
+
+	if not isinstance(samples, numpy.ndarray):
+		my_sample = [samples]
+		my_sample.append(None)
+		samples = numpy.array(my_sample)
 
 	# za svaki uzorak
 	for i in range(0, len(samples)-1):
