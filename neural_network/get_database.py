@@ -49,28 +49,28 @@ def return_represent_points(normalized_points, M, D):
 	:return: numpy.array: [[x1, y1], [x2, y2], [x3, y3] ... ] list of lists
 	"""
 	represent_points = []
-	distance_till_now = 0
-	k = 0
-	while k <= M:
+	k = 1
+	represent_points.append(normalized_points[0])
+	while k < M:
+		wanted_distance = k * D / (M - 1)  # distance that we want to keep between the first point
+											# and the point that we are looking at now
+		distance_till_now = 0
 		for index, point in enumerate(normalized_points):
-			wanted_distance = k * D / (M - 1)  # distance that we want to keep between two points
 			if index == 0:
-				represent_points.append(point)
-				k += 1
 				continue
 			else:
-				distance_till_now += numpy.linalg.norm(represent_points[-1] - point)
+				distance_till_now += numpy.linalg.norm(normalized_points[index-1] - point)
 				if distance_till_now >= wanted_distance:
 					represent_points.append(point)
 					k += 1
-					continue
+					break
 	return numpy.array(represent_points)
 
 
 def test_plot_letters(normalized_points, represent_points):
 	plt.figure(1)
-	plt.plot(normalized_points[:, 0], normalized_points[:, 1], label="Normalized points")
-	plt.plot(represent_points[:, 0], represent_points[:, 1], 'r', label="Represent points")
+	#plt.plot(normalized_points[:, 0], normalized_points[:, 1], label="Normalized points")
+	plt.plot(represent_points[:, 0], represent_points[:, 1], 'ro', label="Represent points")
 	plt.legend()
 	plt.show()
 
@@ -106,10 +106,11 @@ def defining_points_for_training(file, M):
 
 if __name__ == '__main__':
 	M = 50
-	#file = "my_final_database.txt"
+	file = "my_final_database2.txt"
 	defining_points_for_training(file, M)
-	# points = run_gui()
-	# normalized_points = normalize_points(points)
-	# D = calculate_distance(normalized_points)
-	# represent_points = return_represent_points(normalized_points, M, D)
-	# test_plot_letters(normalized_points, represent_points)
+	#points = run_gui()
+	#normalized_points = normalize_points(points)
+	#D = calculate_distance(normalized_points)
+	#represent_points = return_represent_points(normalized_points, M, D)
+	# print(len(represent_points))
+	#test_plot_letters(normalized_points, represent_points)
