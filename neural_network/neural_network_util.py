@@ -4,8 +4,9 @@ from define_classes import InputNeuron, Neuron, sigmoid, derivatives_sigmoid
 
 def train(samples, neural_net):
 	"""
-
-	:param samples: 
+	Function used for training neural network. 
+	Backpropagation is used in for loop.
+	:param samples: numpy.array - list of Sample class instances
 	:param neural_net: list of lists [[input_neuron1, input_neuron2, ...], [hidden_neuron1, hidden_neuron2...], ...] 
 	:return: list of lists
 	"""
@@ -71,11 +72,11 @@ def get_neural_net_output(input, neural_net):
 	return nn_output
 
 
-
 def backpropagation(eta, samples, neural_net):
 	"""
-	:param eta: stopa ucenja
-	:param samples: lista uzoraka
+	Implementing backpropagation algorithm.
+	:param eta: learning rate
+	:param samples: numpy.array - list of Sample class instances
 	"""
 	# initialization of gradients
 	# inicijalizacija gradijenata na nulu, mora se dogoditi pri svakom uzorku
@@ -92,8 +93,6 @@ def backpropagation(eta, samples, neural_net):
 		nn_outputs = get_neural_net_output(samples[i].inputs, neural_net)
 
 		# izracunati pogresku output layera neuronske mreze
-		# OVDJE JE PROBLEM, IMAM 5 ZELJENIH OUTPUTA I 5 PRAVIH OUTPUTA
-		# DOBIJEM e = 1X5
 		e = numpy.subtract(samples[i].outputs, nn_outputs)
 		# prolazanje unazad po neuronskoj mrezi,
 		# od zadnjeg sloja prema prvom
@@ -136,4 +135,3 @@ def backpropagation(eta, samples, neural_net):
 				neural_net[layer_idx][neuron_idx].weights_from_previous_layer[previous_idx] += change
 
 	return neural_net
-

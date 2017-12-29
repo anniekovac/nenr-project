@@ -9,7 +9,7 @@ def get_database_from_txt(path_to_db):
 	"""
 	Function used for importing database of greek letters.
 	:param path_to_db: str (path to database you want to import)
-	:return: numpy.array
+	:return: numpy.array of Sample class instances ([Sample_instance1, Sample_instance2, ...])
 	"""
 	with open(path_to_db, 'r') as database:
 		samples = []
