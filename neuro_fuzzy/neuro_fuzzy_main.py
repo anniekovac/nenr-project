@@ -61,8 +61,8 @@ def t_norm(x, membership_A, membership_B):
 def calculate_f_for_rule(x, y, p, q, r):
 	"""
 	Calculating output f for only one rule od antecedent.
-	:param x: float (should be learned by neural network)
-	:param y: float (should be learned by neural network)
+	:param x: float 
+	:param y: float 
 	:param p: float (should be learned by neural network)
 	:param q: float (should be learned by neural network)
 	:param r: float (should be learned by neural network)
