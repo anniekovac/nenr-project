@@ -1,24 +1,53 @@
 import numpy
-from pprint import pprint as pp
 
 
-def my_function(x, y):
-	return (numpy.square(x - 1) + numpy.square(y + 2) - 5*x*y + 3) * numpy.square(numpy.cos(x/5))
+class Neuron(object):
+	def __init__(self, previous_layer_neurons):
+		self.layer_number = None
+		self.output = None
+		self.previous_layer_neurons = previous_layer_neurons
 
 
-def generate_database():
+class InputNeuron(Neuron):
+	def __init__(self, previous_layer_neurons):
+		super().__init__(previous_layer_neurons)
+		self.input = None
+
+
+def set_net_acrhitecture():
 	"""
-	Generating database for my_function in its domain.
-	:return: 
+	Defining network architecture.
+	:return: numpy.array - list of lists in which lists are layers
+							instances of classes Neuron and InputNeuron are
+							used in lists that represent layers
 	"""
-	x = [i for i in range(-4, 5)]
-	y = [j for j in range(-4, 5)]
-	f = dict()
-	for i in x:
-		for j in y:
-			output = my_function(i, j)
-			f[(i, j)] = output
+	input_neurons = numpy.array([InputNeuron(numpy.array([])), InputNeuron(numpy.array([])),
+								 InputNeuron(numpy.array([])), InputNeuron(numpy.array([]))])
+	layer2 = numpy.array([Neuron(input_neurons), Neuron(input_neurons)])
+	layer3 = numpy.array([Neuron(layer2), Neuron(layer2)])
+	layer4 = numpy.array([Neuron(layer3), Neuron(layer3)])
+	layer5 = numpy.array([Neuron(layer4)])
+	neural_net = numpy.array([input_neurons, layer2, layer3, layer4, layer5])
+	return neural_net
+
+
+def membership_function(x, a=1, b=1):
+	"""
+	Calculating membership function on domain x based on 
+	function defined in homework preparations.
+	:param x: numpy.array (domain of the fuzzy set) 
+	:param a: float
+	:param b: float
+	:return: dict
+	"""
+	member_func = 1/(1 + numpy.exp(b*(x - a)))
+	membership_dict = dict()
+	for element, membership in zip(x, member_func):
+		membership_dict[element] = membership
+	return membership_dict
+
+#def t_norm()
 
 
 if __name__ == '__main__':
-	generate_database()
+	nn = set_net_acrhitecture()
