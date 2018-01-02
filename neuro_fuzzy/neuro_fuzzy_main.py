@@ -46,8 +46,22 @@ def membership_function(x, a=1, b=1):
 		membership_dict[element] = membership
 	return membership_dict
 
-#def t_norm()
+
+def t_norm(x, membership_A, membership_B):
+	"""
+	
+	:param x: float (crisp, element of domain both for A and B) 
+	:param membership_A: dict (membership dict for fuzzy set A)
+	:param membership_B: dict (membership dict for fuzzy set B) 
+	:return: float
+	"""
+	return membership_A[x] * membership_B[x]
 
 
 if __name__ == '__main__':
 	nn = set_net_acrhitecture()
+	x = numpy.array([i for i in range(-4, 4)])
+	y = numpy.array([i for i in range(-4, 4)])
+	A = membership_function(x, a=2, b=3)
+	B = membership_function(y, a=1, b=1)
+	print(t_norm(3, A, B))
