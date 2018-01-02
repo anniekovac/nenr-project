@@ -49,7 +49,7 @@ def membership_function(x, a=1, b=1):
 
 def t_norm(x, membership_A, membership_B):
 	"""
-	
+	Implemented t-norm based on product.
 	:param x: float (crisp, element of domain both for A and B) 
 	:param membership_A: dict (membership dict for fuzzy set A)
 	:param membership_B: dict (membership dict for fuzzy set B) 
@@ -58,6 +58,48 @@ def t_norm(x, membership_A, membership_B):
 	return membership_A[x] * membership_B[x]
 
 
+def calculate_f_for_rule(x, y, p, q, r):
+	"""
+	Calculating output f for only one rule od antecedent.
+	:param x: float (should be learned by neural network)
+	:param y: float (should be learned by neural network)
+	:param p: float (should be learned by neural network)
+	:param q: float (should be learned by neural network)
+	:param r: float (should be learned by neural network)
+	:return: 
+	"""
+	return p*x + q*y + r
+
+
+def calculate_mean_weights(weights, individual_rule_outputs):
+	"""
+	Calculating mean weights that are supposed to be calculated in 
+	layer 3. 
+	:param weights: numpy.array 
+	:param individual_rule_outputs: numpy.array 
+	:return: numpy.array
+	"""
+	mean_weights = []
+	sum_of_weights = numpy.sum(weights)
+	for weight, output in zip(weights, individual_rule_outputs):
+		mean_weights.append(weight*output/sum_of_weights)
+	mean_weights = numpy.array(mean_weights)
+	return mean_weights
+
+
+def calculate_output(mean_weights, individual_rule_outputs):
+	"""
+	Calculating final output in output neuron (layer 5).
+	:param mean_weights: numpy.array 
+	:param individual_rule_outputs: numpy.array
+	:return: float
+	"""
+	sum_of_outputs = 0
+	for weight, output in zip(mean_weights, individual_rule_outputs):
+		sum_of_outputs += weight*output
+	return sum_of_outputs
+
+# TODO implement possibility of various number of rules
 if __name__ == '__main__':
 	nn = set_net_acrhitecture()
 	x = numpy.array([i for i in range(-4, 4)])
