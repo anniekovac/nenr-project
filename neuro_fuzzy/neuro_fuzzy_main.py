@@ -1,4 +1,5 @@
 import numpy
+from database_util import generate_database
 from pprint import pprint as pp
 
 
@@ -15,6 +16,18 @@ class InputNeuron(Neuron):
 		self.input = None
 
 
+class MembershipFunctionNeuron(InputNeuron):
+	"""
+	This Neuron is meant to be used only in layer 1, 
+	where neurons use membership functions.
+	"""
+	def __init__(self, previous_layer_neurons):
+		super().__init__(previous_layer_neurons)
+		self.membership_function = None
+		self.a = None
+		self.b = None
+
+
 def set_net_acrhitecture(number_of_rules):
 	"""
 	Defining network architecture.
@@ -23,13 +36,20 @@ def set_net_acrhitecture(number_of_rules):
 							instances of classes Neuron and InputNeuron are
 							used in lists that represent layers
 	"""
-	input_neurons = numpy.array([InputNeuron(numpy.array([])) for i in range(2*number_of_rules)])
+	# initializing number and types of neurons
+	input_neurons = numpy.array([MembershipFunctionNeuron(numpy.array([])) for i in range(2*number_of_rules)])
 	layer2 = numpy.array([Neuron(input_neurons) for i in range(number_of_rules)])
 	layer3 = numpy.array([Neuron(layer2) for i in range(number_of_rules)])
 	layer4 = numpy.array([Neuron(layer3) for i in range(number_of_rules)])
-
 	layer5 = numpy.array([Neuron(layer4)])
 	neural_net = numpy.array([input_neurons, layer2, layer3, layer4, layer5])
+
+	# initializing membership functions for neurons that have them
+	# neurons in input layer are using these membership functions
+	for neuron in input_neurons:
+		neuron.a = numpy.random.uniform(low=0, high=1) # a parameter of membership function
+		neuron.b = numpy.random.uniform(low=0, high=1) # b parameter of membership function
+
 	return neural_net
 
 
@@ -102,11 +122,14 @@ def calculate_output(mean_weights, individual_rule_outputs):
 	return sum_of_outputs
 
 
+def main(number_of_rules=2):
+	samples = generate_database()
+	nn = set_net_acrhitecture(number_of_rules)
+
+
 if __name__ == '__main__':
-	nn = set_net_acrhitecture(3)
-	pp(nn)
+	nn = set_net_acrhitecture(2)
 	x = numpy.array([i for i in range(-4, 4)])
 	y = numpy.array([i for i in range(-4, 4)])
 	A = membership_function(x, a=2, b=3)
 	B = membership_function(y, a=1, b=1)
-	print(t_norm(3, A, B))
