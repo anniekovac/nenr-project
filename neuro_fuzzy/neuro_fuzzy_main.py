@@ -1,4 +1,5 @@
 import numpy
+from pprint import pprint as pp
 
 
 class Neuron(object):
@@ -14,18 +15,19 @@ class InputNeuron(Neuron):
 		self.input = None
 
 
-def set_net_acrhitecture():
+def set_net_acrhitecture(number_of_rules):
 	"""
 	Defining network architecture.
+	:arg number_of_rules: int
 	:return: numpy.array - list of lists in which lists are layers
 							instances of classes Neuron and InputNeuron are
 							used in lists that represent layers
 	"""
-	input_neurons = numpy.array([InputNeuron(numpy.array([])), InputNeuron(numpy.array([])),
-								 InputNeuron(numpy.array([])), InputNeuron(numpy.array([]))])
-	layer2 = numpy.array([Neuron(input_neurons), Neuron(input_neurons)])
-	layer3 = numpy.array([Neuron(layer2), Neuron(layer2)])
-	layer4 = numpy.array([Neuron(layer3), Neuron(layer3)])
+	input_neurons = numpy.array([InputNeuron(numpy.array([])) for i in range(2*number_of_rules)])
+	layer2 = numpy.array([Neuron(input_neurons) for i in range(number_of_rules)])
+	layer3 = numpy.array([Neuron(layer2) for i in range(number_of_rules)])
+	layer4 = numpy.array([Neuron(layer3) for i in range(number_of_rules)])
+
 	layer5 = numpy.array([Neuron(layer4)])
 	neural_net = numpy.array([input_neurons, layer2, layer3, layer4, layer5])
 	return neural_net
@@ -66,7 +68,7 @@ def calculate_f_for_rule(x, y, p, q, r):
 	:param p: float (should be learned by neural network)
 	:param q: float (should be learned by neural network)
 	:param r: float (should be learned by neural network)
-	:return: 
+	:return: float
 	"""
 	return p*x + q*y + r
 
@@ -99,9 +101,10 @@ def calculate_output(mean_weights, individual_rule_outputs):
 		sum_of_outputs += weight*output
 	return sum_of_outputs
 
-# TODO implement possibility of various number of rules
+
 if __name__ == '__main__':
-	nn = set_net_acrhitecture()
+	nn = set_net_acrhitecture(3)
+	pp(nn)
 	x = numpy.array([i for i in range(-4, 4)])
 	y = numpy.array([i for i in range(-4, 4)])
 	A = membership_function(x, a=2, b=3)
