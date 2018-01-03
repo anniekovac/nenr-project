@@ -4,6 +4,13 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 
+class Sample(object):
+	def __init__(self, x, y, f):
+		self.x = x
+		self.y = y
+		self.f = f
+
+
 def my_function(x, y):
 	"""
 	Function defined by assignment.
@@ -34,20 +41,21 @@ def plot3d(x, y):
 def generate_database():
 	"""
 	Generating database for my_function in its domain.
-	:return: dict ({(x, y) : f}) where x, y are points in functions domain
-								 and f is value of that function in these points
+	:return: numpy.array of Sample class instances
 	"""
 	x = [i for i in range(-4, 5)]
 	y = [j for j in range(-4, 5)]
-	f = dict()
+	samples = []
 	for i in x:
 		for j in y:
 			output = my_function(i, j)
-			f[(i, j)] = output
-	return f
+			sample = Sample(i, j, output)
+			samples.append(sample)
+	samples = numpy.array(samples)
+	return samples
+
 
 if __name__ == '__main__':
-	#generate_database()
 	x = [i for i in range(-4, 5)]
 	y = [j for j in range(-4, 5)]
 	plot3d(x, y)
