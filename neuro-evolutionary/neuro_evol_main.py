@@ -12,7 +12,14 @@ class NeuralNetwork():
 		self.parameters_list = numpy.random.uniform(low=-4, high=4, size=(number_of_params,))
 		self.arch_numbers = arch_numbers
 
+	# TODO: if there are more hidden layers
 	def calculate_output(self, input):
+		"""
+		This function calculates input of this neural network
+		based on input given to it (coordinates of a point).
+		:param input: tuple (x, y) coordinates
+		:return: list
+		"""
 		x, y = input
 		for layer_idx, neuron_number in enumerate(self.arch_numbers):
 			if layer_idx == 0:
@@ -82,6 +89,14 @@ class NeuralNetwork():
 
 
 def calculate_param_number(arch_numbers):
+	"""
+	Function for calculating how many parameters
+	neural network needs based on architecture numbers
+	we have given to it.
+	:param arch_numbers: list of integers [2, 8, 3] - 3 layers, 2 neurons in first, 
+													 	8 neurons in second, 3 neurons in third 
+	:return: int (number of parameters)
+	"""
 	# calculating how many parameters this network needs
 	sum_of_params = 0
 	for idx, number in enumerate(arch_numbers):
@@ -94,6 +109,7 @@ def calculate_param_number(arch_numbers):
 		else:
 			sum_of_params += number * (arch_numbers[1])
 	return sum_of_params
+
 
 if __name__ == '__main__':
 	arch_numbers = [2, 8, 3]
