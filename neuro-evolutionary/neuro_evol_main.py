@@ -2,7 +2,6 @@ import sys
 import numpy
 sys.path.append("..")  # Adds higher directory to python modules path.
 import evolutionary_computing.main as evol
-import neural_network.neural_network_util as nn_util
 from pprint import pprint as pp
 import get_database
 
@@ -11,6 +10,15 @@ class NeuralNetwork():
 	def __init__(self, number_of_params, arch_numbers):
 		self.parameters_list = numpy.random.uniform(low=-4, high=4, size=(number_of_params,))
 		self.arch_numbers = arch_numbers
+		self.dataset = get_database.get_database()
+
+	def calculate_MSE(self):
+		mse_sum = 0
+		for data in self.dataset.list_of_data:
+			correct_output = numpy.array(data.belongs_to_class)
+			nn_output = numpy.array(self.calculate_output(data.coordinates))
+			mse_sum += numpy.sum(numpy.square([item for item in (numpy.array([1, 0.5, 0.2]) - numpy.array([0, 0, 0]))]))
+		return mse_sum/len(self.dataset.list_of_data)
 
 	# TODO: if there are more hidden layers
 	def calculate_output(self, input):
@@ -85,6 +93,7 @@ class NeuralNetwork():
 
 				previous_layer_outputs = new_outputs
 
+		#return [round(output) for output in previous_layer_outputs]
 		return previous_layer_outputs
 
 
@@ -115,8 +124,5 @@ if __name__ == '__main__':
 	arch_numbers = [2, 8, 3]
 	number_of_params = calculate_param_number(arch_numbers)
 	nn = NeuralNetwork(number_of_params, arch_numbers)
+	nn.calculate_MSE()
 
-	dataset = get_database.get_database()
-	for data in dataset.list_of_data:
-		#print(data.coordinates)
-		print(nn.calculate_output(data.coordinates))

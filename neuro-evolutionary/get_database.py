@@ -76,7 +76,8 @@ def get_database():
 			line = line.replace("\n", "")
 			data = line.split("\t")
 			x, y = data[0], data[1]
-			belongs_to_class = "".join(data[2:])
+			# belongs_to_class = "".join(data[2:])
+			belongs_to_class = data[2:]
 			data = DataInstance((x, y), belongs_to_class)
 			dataset.append(data)
 
