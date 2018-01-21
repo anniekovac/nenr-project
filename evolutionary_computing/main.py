@@ -100,7 +100,7 @@ def crossover(guess1, guess2, mut_prob):
 	return new_gene_instance
 
 
-def generate_population(n):
+def generate_population(n, size_of_gene=5):
 	"""
 	Generating first population. Genes are random (float) 
 	numbers in interval	[-4, 4]. For every guess in population
@@ -111,11 +111,14 @@ def generate_population(n):
 	"""
 	population = []
 	for guess in range(n):
-		genes = numpy.random.uniform(low=-4, high=4, size=(5,))
+		genes = numpy.random.uniform(low=-4, high=4, size=(size_of_gene,))
 		guess_instance = Guess(genes)
-		fitness, MSE = get_fitness(guess_instance)
-		guess_instance.fitness = fitness
-		guess_instance.MSE = MSE
+		try:
+			fitness, MSE = get_fitness(guess_instance)
+			guess_instance.fitness = fitness
+			guess_instance.MSE = MSE
+		except ValueError:  # function is used in last homework, there is no fitness until all generation is created
+			pass
 		population.append(guess_instance)
 	return population
 
@@ -136,8 +139,26 @@ def roulette_wheel(population):
 			return key
 
 
-def kanonski_generacijski(n, iterations, mut_prob, mse_exit_criteria=0.01, elitism=True):
-	population = generate_population(n)
+def calculate_MSE(nn):
+	"""
+	Function for calculating MSE in last homework.
+	:param nn: NeuralNetwork class instance
+	:return: float
+	"""
+	mse_sum = 0
+	for data in nn.dataset.list_of_data:
+		correct_output = numpy.array(data.belongs_to_class)
+		nn_output = numpy.array(nn.calculate_output(data.coordinates))
+		mse_sum += numpy.sum(numpy.square(correct_output - nn_output))
+	return mse_sum / len(nn.dataset.list_of_data)
+
+
+def kanonski_generacijski(n, iterations, mut_prob, mse_exit_criteria=0.01, last_hw=False, network=None, elitism=True):
+	population = generate_population(n, size_of_gene=len(network.parameters_list))
+	if last_hw:
+		for guess in population:
+			guess.MSE = calculate_MSE(network)
+			guess.fitness = 1 / guess.MSE
 	i = iterations
 	while i:
 		i -= 1
@@ -149,7 +170,12 @@ def kanonski_generacijski(n, iterations, mut_prob, mse_exit_criteria=0.01, eliti
 			first_parent = roulette_wheel(population)
 			second_parent = roulette_wheel(population)
 			child = crossover(first_parent, second_parent, mut_prob)
-			fitness, MSE = get_fitness(child)
+			if last_hw:
+				network.parameters_list = child.gene
+				MSE = calculate_MSE(network)
+				fitness = 1/MSE
+			else:
+				fitness, MSE = get_fitness(child)
 			child.fitness = fitness
 			child.MSE = MSE
 			new_population.append(child)
@@ -230,7 +256,7 @@ def plot(final, best):
 def main():
 	n = 15  # POPULATION SIZE
 	mut_prob = 0.01  # MUTATION PROBABILITY
-	number_of_iterations = 25000  # NUMBER OF ITERATIONS
+	number_of_iterations = 2500  # NUMBER OF ITERATIONS
 
 	dataset1 = os.path.join(os.path.dirname(__file__), "zad4-dataset1.txt")
 	final = parse_data(dataset1)

@@ -2,23 +2,17 @@ import sys
 import numpy
 sys.path.append("..")  # Adds higher directory to python modules path.
 import evolutionary_computing.main as evol
-from pprint import pprint as pp
 import get_database
 
 
 class NeuralNetwork():
-	def __init__(self, number_of_params, arch_numbers):
-		self.parameters_list = numpy.random.uniform(low=-4, high=4, size=(number_of_params,))
+	def __init__(self, number_of_params, arch_numbers, parameters=None):
+		if parameters is not None:
+			self.parameters_list = parameters
+		else:
+			self.parameters_list = numpy.random.uniform(low=-4, high=4, size=(number_of_params,))
 		self.arch_numbers = arch_numbers
 		self.dataset = get_database.get_database()
-
-	def calculate_MSE(self):
-		mse_sum = 0
-		for data in self.dataset.list_of_data:
-			correct_output = numpy.array(data.belongs_to_class)
-			nn_output = numpy.array(self.calculate_output(data.coordinates))
-			mse_sum += numpy.sum(numpy.square([item for item in (numpy.array([1, 0.5, 0.2]) - numpy.array([0, 0, 0]))]))
-		return mse_sum/len(self.dataset.list_of_data)
 
 	# TODO: if there are more hidden layers
 	def calculate_output(self, input):
@@ -33,7 +27,7 @@ class NeuralNetwork():
 			if layer_idx == 0:
 				# these are input neurons
 				previous_layer_outputs = [x, y]
-			elif layer_idx == 2:
+			elif layer_idx == 1:
 				# these are neurons of second layer
 				# these calculate weighted sum
 
@@ -122,7 +116,8 @@ def calculate_param_number(arch_numbers):
 
 if __name__ == '__main__':
 	arch_numbers = [2, 8, 3]
+	n = 25  # size of population
+	iterations = 12500
 	number_of_params = calculate_param_number(arch_numbers)
 	nn = NeuralNetwork(number_of_params, arch_numbers)
-	nn.calculate_MSE()
-
+	evol.kanonski_generacijski(n, iterations, 0.1, last_hw=True, network=nn)
