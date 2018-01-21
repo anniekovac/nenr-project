@@ -77,7 +77,7 @@ def get_database():
 			data = line.split("\t")
 			x, y = data[0], data[1]
 			# belongs_to_class = "".join(data[2:])
-			belongs_to_class = data[2:]
+			belongs_to_class = [int(item) for item in data[2:]]
 			data = DataInstance((x, y), belongs_to_class)
 			dataset.append(data)
 
