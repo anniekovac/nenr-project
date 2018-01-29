@@ -2,6 +2,7 @@ import numpy
 from pprint import pprint as pp
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from fuzzy_util import membership_function
 
 
 class Sample(object):
@@ -55,7 +56,25 @@ def generate_database():
 	return samples
 
 
+def plot_membership(membership_dict, title=""):
+	x_axis = []
+	y_axis = []
+	for key, item in membership_dict.items():
+		x_axis.append(key)
+		y_axis.append(item)
+
+	x_axis = numpy.array(x_axis)
+	y_axis = numpy.array(y_axis)
+	plt.figure(1)
+	plt.plot(x_axis, y_axis) #, label="Correct outputs")
+	plt.title("Membership function {}".format(title))
+	plt.grid()
+	plt.show()
+
+
 if __name__ == '__main__':
-	x = [i for i in range(-4, 5)]
-	y = [j for j in range(-4, 5)]
-	plot3d(x, y)
+	x = numpy.array([i for i in range(-4, 5)])
+	y = numpy.array([j for j in range(-4, 5)])
+	# plot3d(x, y)
+	member_dict = membership_function(x)
+	plot_membership(member_dict)
