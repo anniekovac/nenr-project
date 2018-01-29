@@ -1,5 +1,5 @@
 import numpy
-from database_util import generate_database
+from database_util import generate_database, plot3d
 import fuzzy_util as fuzzy
 from pprint import pprint as pp
 
@@ -218,7 +218,7 @@ def backpropagation(samples, nn, number_of_rules, eta):
 
 				do_dw += nn[1][j].output * (nn[3][rule_idx].f - nn[3][j].f)
 				w_square_sum += numpy.square(nn[1][j].output)
-				w_sum += nn[3][j].output
+				w_sum += nn[1][j].output
 
 			do_dw = float(do_dw)/float(w_square_sum)
 
@@ -236,8 +236,8 @@ def backpropagation(samples, nn, number_of_rules, eta):
 			aB_gradients[0][rule_idx] += diff_outputs * do_dw * mi_A* b_B * mi_B * (1 - mi_B)
 			bB_gradients[0][rule_idx] += diff_outputs * do_dw * mi_A * (sample.x - a_B) * mi_B * (mi_B - 1)
 
-			w_i = nn[3][rule_idx].output
-			pi_gradients[0][rule_idx] += diff_outputs * w_i * sample.x / float(w_sum)
+			w_i = nn[1][rule_idx].output
+			pi_gradients[0][rule_idx] += float(diff_outputs * w_i * sample.x) / float(w_sum)
 			qi_gradients[0][rule_idx] += diff_outputs * w_i * sample.y / float(w_sum)
 			ri_gradients[0][rule_idx] += diff_outputs * w_i / float(w_sum)
 
@@ -249,8 +249,8 @@ def backpropagation(samples, nn, number_of_rules, eta):
 		nn[3][index].q += eta * qi_gradients[0][index]
 		nn[3][index].r += eta * ri_gradients[0][index]
 
+	# postavljanje parametara neurona prvog sloja
 	for index, neuron in enumerate(nn[0]):
-
 		nn[0][index][0].b += eta * bA_gradients[0][index]  # parameter b za neizraziti skup Ai (ovdje je i = index)
 		nn[0][index][0].a += eta * aA_gradients[0][index]  # parameter a za neizraziti skup Ai (ovdje je i = index)
 		nn[0][index][1].b += eta * bB_gradients[0][index]  # parameter b za neizraziti skup Bi (ovdje je i = index)
@@ -259,27 +259,23 @@ def backpropagation(samples, nn, number_of_rules, eta):
 	return nn
 
 
-def train(max_number_of_iterations, samples, nn, number_of_rules=2):
+def train(max_number_of_iterations, samples, nn, number_of_rules=8):
 	for i in range(0, max_number_of_iterations):
-		nn = backpropagation(samples, nn, number_of_rules, 0.000001)
+		for sample in samples:
+			nn = backpropagation([sample], nn, number_of_rules, 0.000001)
 		if i % 100 == 0:
-			print("Iteration: {}, MSE: {}".format(i, calculate_MSE(samples, nn)))
+			mse = calculate_MSE(samples, nn)
+			# false_mse = 1/mse
+			print("Iteration: {}, MSE: {}".format(i, mse))
 
 
-def main(number_of_rules=2):
+def main(number_of_rules=8):
 	samples = generate_database()  # generating database of x, y, f
+
 	nn = set_net_acrhitecture(number_of_rules)  # getting neural net of architecture based on number of rules
-	# for sample in samples:  # for every sample
-	# 	forward_pass(nn, sample.x, sample.y)
 	iterations = 10000
 	train(iterations, samples, nn, number_of_rules)
 
 
-# TODO: make a difference between A and B part of the antecedent
 if __name__ == '__main__':
-	# nn = set_net_acrhitecture(2)
-	# x = numpy.array([i for i in range(-4, 4)])
-	# y = numpy.array([i for i in range(-4, 4)])
-	# A = membership_function(x, a=2, b=3)
-	# B = membership_function(y, a=1, b=1)
 	main()
